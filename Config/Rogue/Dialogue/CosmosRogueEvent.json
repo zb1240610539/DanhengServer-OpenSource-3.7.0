@@ -1,0 +1,2310 @@
+[
+  {
+    "NpcId": 10101,
+    "Progress": 0,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10101,
+        "SelectActions": [
+          {
+            "Name": "ActionEnhanceRandomBuff",
+            "Param": {
+              "Count": 2,
+              "GroupId": 0
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10102,
+        "SelectActions": [
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 12002,
+              "HintId": 7
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 10201,
+    "Progress": 0,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10201,
+        "DynamicActions": [
+          {
+            "DynamicId": 120,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12001
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 121,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12101
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 122,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12201
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 123,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12301
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 124,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12401
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 125,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12501
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 126,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12601
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 127,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12701
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 128,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12801
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "OptionId": 10202,
+        "DynamicActions": [
+          {
+            "DynamicId": 120,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12002
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 121,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12102
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 122,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12202
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 123,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12302
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 124,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12402
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 125,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12502
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 126,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12602
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 127,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12702
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 128,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12802
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "OptionId": 10203,
+        "DynamicActions": [
+          {
+            "DynamicId": 120,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12003
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 121,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12103
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 122,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12203
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 123,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12303
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 124,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12403
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 125,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12503
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 126,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12603
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 127,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12703
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 128,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12803
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "OptionId": 10204
+      }
+    ]
+  },
+  {
+    "NpcId": 10201,
+    "Progress": 1,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10201,
+        "DynamicActions": [
+          {
+            "DynamicId": 120,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12001
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 121,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12101
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 122,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12201
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 123,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12301
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 124,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12401
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 125,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12501
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 126,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12601
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 127,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12701
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 128,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 3,
+                  "GroupId": 12801
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "OptionId": 10202,
+        "DynamicActions": [
+          {
+            "DynamicId": 120,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12002
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 121,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12102
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 122,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12202
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 123,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12302
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 124,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12402
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 125,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12502
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 126,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12602
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 127,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12702
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 128,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 2,
+                  "GroupId": 12802
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "OptionId": 10203,
+        "DynamicActions": [
+          {
+            "DynamicId": 120,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12003
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 121,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12103
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 122,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12203
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 123,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12303
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 124,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12403
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 125,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12503
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 126,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12603
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 127,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12703
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 128,
+            "SelectActions": [
+              {
+                "Name": "ActionEnhanceRandomBuff",
+                "Param": {
+                  "Count": 1,
+                  "GroupId": 12803
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "OptionId": 10204
+      }
+    ]
+  },
+  {
+    "NpcId": 10301,
+    "Progress": 0,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10301,
+        "SelectActions": [
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 100005,
+              "HintId": 7
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10302,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": 100,
+              "ShowType": 2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 10401,
+    "Progress": 0,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10401,
+        "SelectActions": [
+          {
+            "Name": "ActionRandomAction",
+            "Param": {
+              "Percent": 0.8,
+              "SuccAction": [
+                {
+                  "Name": "ActionChangeLineupData",
+                  "Param": {
+                    "HpChange": 10000
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionChangeLineupData",
+                  "Param": {
+                    "HpChangeByCurHp": -2000
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10402,
+        "SelectActions": [
+          {
+            "Name": "ActionRandomAction",
+            "Param": {
+              "Percent": 0.8,
+              "SuccAction": [
+                {
+                  "Name": "ActionDropBuff",
+                  "Param": {
+                    "Count": 1,
+                    "GroupId": 100001
+                  }
+                },
+                {
+                  "Name": "ActionAddBuff",
+                  "Param": {
+                    "Count": 1,
+                    "GroupId": 100002,
+                    "HintId": 7
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionDropBuff",
+                  "Param": {
+                    "Count": 1,
+                    "GroupId": 100002
+                  }
+                },
+                {
+                  "Name": "ActionAddBuff",
+                  "Param": {
+                    "Count": 1,
+                    "GroupId": 100001,
+                    "HintId": 7
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10403
+      },
+      {
+        "OptionId": 10410
+      }
+    ]
+  },
+  {
+    "NpcId": 10501,
+    "Progress": 0,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10501,
+        "SelectActions": [
+          {
+            "Name": "ActionDropBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 100005
+            }
+          },
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 100004,
+              "HintId": 7
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10502,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": 80,
+              "ShowType": 2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 10601,
+    "Progress": 0,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10601,
+        "SelectActions": [
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 12400,
+              "HintId": 7
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10602,
+        "SelectActions": [
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 12600,
+              "HintId": 7
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10603,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeLineupData",
+            "Param": {
+              "HpChange": 10000
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 10701,
+    "Progress": 0,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10701,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": 200,
+              "ShowType": 2
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10702,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeLineupData",
+            "Param": {
+              "HpChangeByCurHp": -2000
+            }
+          },
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 2,
+              "GroupId": 100001,
+              "HintId": 7
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 10801,
+    "Progress": 0,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10801,
+        "SelectActions": [
+          {
+            "Name": "ActionRandomAction",
+            "Param": {
+              "Percent": 0.6,
+              "SuccAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10803
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10804
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10802,
+        "SelectActions": [
+          {
+            "Name": "ActionRandomAction",
+            "Param": {
+              "Percent": 0.6,
+              "SuccAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10803
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10804
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10805,
+        "SelectActions": [
+          {
+            "Name": "ActionRandomAction",
+            "Param": {
+              "Percent": 0.7,
+              "SuccAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10809
+                  }
+                },
+                {
+                  "Name": "ActionChangeMoney",
+                  "Param": {
+                    "Count": 150,
+                    "ShowType": 2
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionRandomAction",
+                  "Param": {
+                    "Percent": 0.667,
+                    "SuccAction": [
+                      {
+                        "Name": "ActionAddDialogueEvent",
+                        "Param": {
+                          "EventId": 10810
+                        }
+                      }
+                    ],
+                    "FailAction": [
+                      {
+                        "Name": "ActionAddDialogueEvent",
+                        "Param": {
+                          "EventId": 10811
+                        }
+                      },
+                      {
+                        "Name": "ActionChangeMoney",
+                        "Param": {
+                          "Count": 400,
+                          "ShowType": 2
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10806,
+        "SelectActions": [
+          {
+            "Name": "ActionRandomAction",
+            "Param": {
+              "Percent": 0.7,
+              "SuccAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10809
+                  }
+                },
+                {
+                  "Name": "ActionChangeMoney",
+                  "Param": {
+                    "Count": 150,
+                    "ShowType": 2
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionRandomAction",
+                  "Param": {
+                    "Percent": 0.667,
+                    "SuccAction": [
+                      {
+                        "Name": "ActionAddDialogueEvent",
+                        "Param": {
+                          "EventId": 10810
+                        }
+                      }
+                    ],
+                    "FailAction": [
+                      {
+                        "Name": "ActionAddDialogueEvent",
+                        "Param": {
+                          "EventId": 10811
+                        }
+                      },
+                      {
+                        "Name": "ActionChangeMoney",
+                        "Param": {
+                          "Count": 400,
+                          "ShowType": 2
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10807,
+        "SelectActions": [
+          {
+            "Name": "ActionRandomAction",
+            "Param": {
+              "Percent": 0.6,
+              "SuccAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10812
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10811
+                  }
+                },
+                {
+                  "Name": "ActionChangeMoney",
+                  "Param": {
+                    "Count": 400,
+                    "ShowType": 2
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10808,
+        "SelectActions": [
+          {
+            "Name": "ActionRandomAction",
+            "Param": {
+              "Percent": 0.6,
+              "SuccAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10812
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 10811
+                  }
+                },
+                {
+                  "Name": "ActionChangeMoney",
+                  "Param": {
+                    "Count": 400,
+                    "ShowType": 2
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 10901,
+    "Progress": 0,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event"
+    ],
+    "Weight": 100,
+    "Options": [
+      {
+        "OptionId": 10901,
+        "SelectActions": [
+          {
+            "Name": "ActionAddMiracle",
+            "Param": {
+              "MiracleId": 60
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10902
+      },
+      {
+        "OptionId": 10903
+      },
+      {
+        "OptionId": 10907,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": 100,
+              "ShowType": 2
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10904,
+        "SelectActions": [
+          {
+            "Name": "ActionAddMiracle",
+            "Param": {
+              "MiracleId": 60
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10905,
+        "SelectActions": [
+          {
+            "Name": "ActionAddMiracle",
+            "Param": {
+              "MiracleId": 60
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10906,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": 100,
+              "ShowType": 2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 10901,
+    "Progress": 1,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event"
+    ],
+    "Options": [
+      {
+        "OptionId": 10908,
+        "SelectActions": [
+          {
+            "Name": "ActionAddMiracle",
+            "Param": {
+              "MiracleId": 60
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 10909,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": 100,
+              "ShowType": 2
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 11001,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "Options": [
+      {
+        "OptionId": 11001,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeLineupData",
+            "Param": {
+              "HpChangeByCurHp": -3000
+            }
+          },
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 100002,
+              "HintId": 7
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 11002,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeLineupData",
+            "Param": {
+              "HpChangeByCurHp": -8000
+            }
+          },
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 100003,
+              "HintId": 7
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 11101,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "Options": [
+      {
+        "OptionId": 11101
+      },
+      {
+        "OptionId": 11104
+      },
+      {
+        "OptionId": 11102,
+        "SelectActions": [
+          {
+            "Name": "ActionAddMiracle",
+            "Param": {
+              "MiracleId": 59
+            }
+          },
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 100003,
+              "HintId": 7
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 11103,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeLineupData",
+            "Param": {
+              "HpChangeByCurHp": -5000
+            }
+          },
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "Count": 1,
+              "GroupId": 100002,
+              "HintId": 7
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 11201,
+    "Progress": 0,
+    "Weight": 10,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Reward"
+    ],
+    "Options": [
+      {
+        "OptionId": 11201,
+        "DynamicActions": [
+          {
+            "DynamicId": 120,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1200
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 121,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1210
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 122,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1220
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 123,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1230
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 124,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1240
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 125,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1250
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 126,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1260
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 127,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1270
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 128,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1280
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "OptionId": 11202,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": 2000,
+              "ShowType": 2
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 11203,
+        "ValidConditions": [
+          {
+            "Name": "CondLineupHasAvatar",
+            "Param": {
+              "AvatarId": 1303
+            }
+          }
+        ],
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": 2000,
+              "ShowType": 2
+            }
+          }
+        ],
+        "DynamicActions": [
+          {
+            "DynamicId": 120,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1200
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 121,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1210
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 122,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1220
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 123,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1230
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 124,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1240
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 125,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1250
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 126,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1260
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 127,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1270
+                }
+              }
+            ]
+          },
+          {
+            "DynamicId": 128,
+            "SelectActions": [
+              {
+                "Name": "ActionGetBuffInGroup",
+                "Param": {
+                  "GroupId": 1280
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 11301,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Reward"
+    ],
+    "Options": [
+      {
+        "OptionId": 11301,
+        "SelectActions": [
+          {
+            "Name": "ActionTriggerBattle",
+            "Param": {
+              "StageId": 80212011
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 11302
+      }
+    ]
+  },
+  {
+    "NpcId": 13301,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "Options": [
+      {
+        "OptionId": 13301,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoneyRatio",
+            "Param": {
+              "Ratio": 0.5,
+              "ShowType": 2
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 13302,
+        "SelectActions": [
+          {
+            "Name": "ActionRandomAction",
+            "Param": {
+              "Percent": 0.5,
+              "SuccAction": [
+                {
+                  "Name": "ActionTriggerBattle",
+                  "Param": {
+                    "StageId": 80212021
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionTriggerBattle",
+                  "Param": {
+                    "StageId": 80212022
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 13302,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "Options": [
+      {
+        "OptionId": 13303,
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoneyRatio",
+            "Param": {
+              "Ratio": 0.5,
+              "ShowType": 2
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 13304,
+        "SelectActions": [
+          {
+            "Name": "ActionTriggerBattle",
+            "Param": {
+              "StageId": 80212023
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 13501,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "EnterActions": [
+      {
+        "Name": "ActionSetPrivateVariable",
+        "Param": {
+          "VariableName": "GamePercent",
+          "VariableType": "double",
+          "Value": 0.3
+        }
+      }
+    ],
+    "Options": [
+      {
+        "OptionId": 13501,
+        "DisplayValueBind": {
+          "FloatValue": "GamePercent"
+        },
+        "SelectActions": [
+          {
+            "Name": "ActionRandomActionByVariable",
+            "Param": {
+              "PercentName": "GamePercent",
+              "SuccAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 13510
+                  }
+                },
+                {
+                  "Name": "ActionTriggerBattle",
+                  "Param": {
+                    "StageId": 80212022
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionRandomAction",
+                  "Param": {
+                    "Percent": 0.8,
+                    "SuccAction": [
+                      {
+                        "Name": "ActionAddDialogueEvent",
+                        "Param": {
+                          "EventId": 13507
+                        }
+                      },
+                      {
+                        "Name": "ActionAddBuff",
+                        "Param": {
+                          "GroupId": 100410,
+                          "Count": 1,
+                          "HintId": 7
+                        }
+                      }
+                    ],
+                    "FailAction": [
+                      {
+                        "Name": "ActionAddDialogueEvent",
+                        "Param": {
+                          "EventId": 13514
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Name": "ActionChangePrivateVariable",
+                  "Param": {
+                    "VariableName": "GamePercent",
+                    "VariableType": "double",
+                    "Value": 0.3,
+                    "MaxValue": 1.0
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 13506
+      }
+    ]
+  },
+  {
+    "NpcId": 13503,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "EnterActions": [
+      {
+        "Name": "ActionSetPrivateVariable",
+        "Param": {
+          "VariableName": "GamePercent",
+          "VariableType": "double",
+          "Value": 0.25
+        }
+      }
+    ],
+    "Options": [
+      {
+        "OptionId": 13503,
+        "DisplayValueBind": {
+          "FloatValue": "GamePercent"
+        },
+        "SelectActions": [
+          {
+            "Name": "ActionRandomActionByVariable",
+            "Param": {
+              "PercentName": "GamePercent",
+              "SuccAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 13513
+                  }
+                },
+                {
+                  "Name": "ActionTriggerBattle",
+                  "Param": {
+                    "StageId": 80212022
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionRandomAction",
+                  "Param": {
+                    "Percent": 0.8,
+                    "SuccAction": [
+                      {
+                        "Name": "ActionAddDialogueEvent",
+                        "Param": {
+                          "EventId": 13509
+                        }
+                      },
+                      {
+                        "Name": "ActionChangeMoney",
+                        "Param": {
+                          "Count": 100,
+                          "ShowType": 2
+                        }
+                      }
+                    ],
+                    "FailAction": [
+                      {
+                        "Name": "ActionAddDialogueEvent",
+                        "Param": {
+                          "EventId": 13514
+                        }
+                      }
+                    ]
+                  }
+                },
+                {
+                  "Name": "ActionChangePrivateVariable",
+                  "Param": {
+                    "VariableName": "GamePercent",
+                    "VariableType": "double",
+                    "Value": 0.25,
+                    "MaxValue": 1.0
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 13506
+      }
+    ]
+  },
+  {
+    "NpcId": 13401,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "Options": [
+      {
+        "OptionId": 13401,
+        "SelectActions": [
+          {
+            "Name": "ActionTriggerBattle",
+            "Param": {
+              "StageId": 80212031
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 13402,
+        "ValidConditions": [
+          {
+            "Name": "CondCheckMoney",
+            "Param": {
+              "GreaterOrEqual": 100
+            }
+          }
+        ],
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": -100,
+              "ShowType": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 13402,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Encounter"
+    ],
+    "Options": [
+      {
+        "OptionId": 13403,
+        "SelectActions": [
+          {
+            "Name": "ActionTriggerBattle",
+            "Param": {
+              "StageId": 80212032
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 13404,
+        "ValidConditions": [
+          {
+            "Name": "CondCheckMoney",
+            "Param": {
+              "GreaterOrEqual": 100
+            }
+          }
+        ],
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": -100,
+              "ShowType": 0
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "NpcId": 14001,
+    "Progress": 0,
+    "Weight": 100,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Reward"
+    ],
+    "Options": [
+      {
+        "OptionId": 14001,
+        "ValidConditions": [
+          {
+            "Name": "CondCheckMoney",
+            "Param": {
+              "GreaterOrEqual": 50
+            }
+          }
+        ],
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": -50,
+              "ShowType": 0
+            }
+          },
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "GroupId": 100410,
+              "Count": 1,
+              "HintId": 7
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 14002,
+        "ValidConditions": [
+          {
+            "Name": "CondCheckMoney",
+            "Param": {
+              "GreaterOrEqual": 100
+            }
+          }
+        ],
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": -100,
+              "ShowType": 0
+            }
+          },
+          {
+            "Name": "ActionAddBuff",
+            "Param": {
+              "GroupId": 100420,
+              "Count": 1,
+              "HintId": 7
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 14003
+      }
+    ]
+  },
+  {
+    "NpcId": 19301,
+    "Progress": 0,
+    "Weight": 80,
+    "AllowRogueType": [
+      "CosmosRogue"
+    ],
+    "AllowRoomType": [
+      "Event",
+      "Reward"
+    ],
+    "EnterActions": [
+      {
+        "Name": "ActionSetPrivateVariable",
+        "Param": {
+          "VariableName": "GamePercent",
+          "VariableType": "double",
+          "Value": 0.3
+        }
+      }
+    ],
+    "Options": [
+      {
+        "OptionId": 19301,
+        "DisplayValueBind": {
+          "FloatValue": "GamePercent"
+        },
+        "ValidConditions": [
+          {
+            "Name": "CondCheckMoney",
+            "Param": {
+              "GreaterOrEqual": 50
+            }
+          }
+        ],
+        "SelectActions": [
+          {
+            "Name": "ActionChangeMoney",
+            "Param": {
+              "Count": -50,
+              "ShowType": 0
+            }
+          },
+          {
+            "Name": "ActionRandomActionByVariable",
+            "Param": {
+              "PercentName": "GamePercent",
+              "SuccAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 19305
+                  }
+                },
+                {
+                  "Name": "ActionAddBuff",
+                  "Param": {
+                    "GroupId": 100003,
+                    "Count": 1,
+                    "HintId": 7
+                  }
+                }
+              ],
+              "FailAction": [
+                {
+                  "Name": "ActionAddDialogueEvent",
+                  "Param": {
+                    "EventId": 19306
+                  }
+                },
+                {
+                  "Name": "ActionChangeMoney",
+                  "Param": {
+                    "Count": 100,
+                    "ShowType": 2
+                  }
+                },
+                {
+                  "Name": "ActionChangePrivateVariable",
+                  "Param": {
+                    "VariableName": "GamePercent",
+                    "VariableType": "double",
+                    "Value": 0.35,
+                    "MaxValue": 1.0
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      },
+      {
+        "OptionId": 19302
+      }
+    ]
+  }
+]

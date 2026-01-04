@@ -1,0 +1,169 @@
+{
+    "199": {
+        "0": [
+            {
+                "BonusType": "Gold",
+                "Value": 2
+            }
+        ]
+    },
+    "102": {
+        "0": [
+            {
+                "BonusType": "Item",
+                "BonusTypeParamList": [
+                    350103
+                ],
+                "Value": 1
+            }
+        ],
+        "1": [
+            {
+                "BonusType": "Item",
+                "BonusTypeParamList": [
+                    350105
+                ],
+                "Value": 1
+            }
+        ]
+    },
+    "203": {
+        "0": [
+            {
+                "BonusType": "RandomEquipByCategory",
+                "BonusTypeParamList": [
+                    1
+                ],
+                "Value": 1
+            }
+        ]
+    },
+    "204": {
+        "0": [
+            {
+                "BonusType": "Gold",
+                "Value": 3
+            },
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    2,
+                    1
+                ],
+                "Value": 2
+            }
+        ]
+    },
+    "206": {
+        "0": [
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    3,
+                    1
+                ],
+                "Value": 3
+            }
+        ],
+        "1": [
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    1,
+                    1
+                ],
+                "Value": 1
+            },
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    1,
+                    1
+                ],
+                "Value": 1
+            }
+        ]
+    },
+    "207": {
+        "0": [
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    4,
+                    1
+                ],
+                "Value": 4
+            }
+        ],
+        "1": [
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    3,
+                    1
+                ],
+                "Value": 3
+            },
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    3,
+                    1
+                ],
+                "Value": 3
+            }
+        ],
+        "2": [
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    3,
+                    2
+                ],
+                "Value": 3
+            }
+        ]
+    },
+    "208": {
+        "0": [
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    4,
+                    1
+                ],
+                "Value": 4
+            },
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    4,
+                    1
+                ],
+                "Value": 4
+            }
+        ]
+    },
+    "120031": {
+        "0": [
+            {
+                "BonusType": "Item",
+                "BonusTypeParamList": [
+                    99998
+                ]
+            }
+        ]
+    },
+    "123105": {
+        "0": [
+            {
+                "BonusType": "RandomAvatar",
+                "BonusTypeParamList": [
+                    4,
+                    2
+                ],
+                "Value": 4
+            }
+        ]
+    }
+}

@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+option csharp_namespace = "EggLink.DanhengServer.Proto.ServerSide";
+
+enum ChallengeLineupTypePb {
+    ChallengeLineupTypePb_None = 0;
+    ChallengeLineupTypePb_Challenge1 = 1;
+    ChallengeLineupTypePb_Challenge2 = 3;
+    ChallengeLineupTypePb_Challenge3 = 4;
+}
+
+message Vector3Pb {
+    int32 x = 1;
+    int32 y = 2;
+    int32 z = 3;
+}
+
+message ChallengeMemoryDataPb {
+    uint32 ChallengeMazeId = 1;
+    Vector3Pb StartPos = 2;
+    Vector3Pb StartRot = 3;
+    uint32 CurrentStage = 4;
+    uint32 CurStatus = 5;
+    uint32 DeadAvatarNum = 6;
+    uint32 SavedMp = 7;
+    ChallengeLineupTypePb CurrentExtraLineup = 8;
+    uint32 RoundsLeft = 9;
+    uint32 Stars = 10;
+}
+
+message ChallengeStoryDataPb {
+    uint32 ChallengeMazeId = 1;
+    Vector3Pb StartPos = 2;
+    Vector3Pb StartRot = 3;
+    uint32 CurrentStage = 4;
+    uint32 CurStatus = 5;
+    uint32 SavedMp = 6;
+    ChallengeLineupTypePb CurrentExtraLineup = 7;
+    uint32 Stars = 8;
+    uint32 ScoreStage1 = 9;
+    uint32 ScoreStage2 = 10;
+    repeated uint32 Buffs = 11;
+}
+
+message ChallengeBossDataPb {
+    uint32 ChallengeMazeId = 1;
+    Vector3Pb StartPos = 2;
+    Vector3Pb StartRot = 3;
+    uint32 CurrentStage = 4;
+    uint32 CurStatus = 5;
+    uint32 SavedMp = 6;
+    ChallengeLineupTypePb CurrentExtraLineup = 7;
+    uint32 Stars = 8;
+    uint32 ScoreStage1 = 9;
+    uint32 ScoreStage2 = 10;
+    repeated uint32 Buffs = 11;
+}
+
+message ChallengePeakDataPb {
+    uint32 CurrentPeakGroupId = 1;
+    uint32 CurrentPeakLevelId = 2;
+    repeated uint32 Buffs = 3;
+    uint32 CurStatus = 4;
+    Vector3Pb StartPos = 5;
+    Vector3Pb StartRot = 6;
+    uint32 SavedMp = 7;
+    uint32 Stars = 8;
+    ChallengeLineupTypePb CurrentExtraLineup = 9;
+    bool IsHard = 10;
+    uint32 RoundCnt = 11;
+}
+
+message ChallengeDataPb {
+    oneof challenge_type {
+        ChallengeMemoryDataPb memory = 1;
+        ChallengeStoryDataPb story = 2;
+        ChallengeBossDataPb boss = 3;
+        ChallengePeakDataPb peak = 4;
+    }
+}

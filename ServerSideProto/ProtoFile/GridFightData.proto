@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+option csharp_namespace = "EggLink.DanhengServer.Proto.ServerSide";
+
+message GridFightShopRoleItemPb {
+    uint32 RoleId = 1;
+    uint32 Tier = 2;
+}
+
+message GridFightShopItemPb {
+    oneof ItemType {
+        GridFightShopRoleItemPb RoleItem = 1;
+    }
+    uint32 Cost = 2;
+    bool SoldOut = 3;
+}
+
+message GridFightShopInfoPb {
+    bool ShopLocked = 1;
+    uint32 FreeRefreshCount = 2;
+    uint32 RefreshCost = 3;
+    repeated GridFightShopItemPb ShopItems = 4;
+}
+
+message GridFightGameInfoPb {
+    uint32 UniqueId = 1;
+    uint32 DivisionId = 2;
+    bool IsOverLock = 3;
+    uint32 Season = 4;
+    repeated GridFightComponentPb Components = 5;
+}
+
+message GridFightBasicInfoPb {
+    uint32 CurGold = 1;
+    uint32 CurLevel = 2;
+    uint32 LevelExp = 3;
+    uint32 BuyLevelCost = 4;
+    uint32 CurHp = 5;
+    uint32 MaxAvatarNum = 6;
+    uint32 ComboNum = 7;
+    uint32 LockType = 8;
+    uint32 LockReason = 9;
+    uint32 MaxInterest = 10;
+    repeated uint32 TrackingTraits = 11;
+    repeated GridFightEquipmentTrackInfoPb TrackingEquipments = 12;
+    string GuideCode = 13;
+    uint32 MaxLevel = 14;
+    uint32 OffFieldAvatarNum = 15;
+}
+
+message GridFightEquipmentTrackInfoPb {
+    uint32 Priority = 1;
+    uint32 RoleId = 2;
+    repeated uint32 EquipmentIds = 3;
+}
+
+message GridFightRoleInfoPb {
+    uint32 RoleId = 1;
+    uint32 Tier = 2;
+    uint32 Pos = 3;
+    uint32 UniqueId = 4;
+    map<string, uint32> SavedValues = 5;
+    repeated uint32 EquipmentIds = 6;
+}
+
+message GridFightNpcInfoPb {
+    uint32 NpcId = 1;
+    uint32 Pos = 2;
+    uint32 UniqueId = 3;
+    repeated uint32 EquipmentIds = 4;
+}
+
+message GridFightForgeInfoPb {
+    uint32 ForgeItemId = 1;
+    uint32 Pos = 2;
+    uint32 UniqueId = 3;
+    repeated GridFightForgeGoodsInfoPb Goods = 4;
+}
+
+message GridFightForgeGoodsInfoPb {
+    oneof GoodsType {
+        uint32 ItemId = 1;
+        GridFightForgeRoleGoodsInfoPb RoleInfo = 2;
+    }
+}
+
+message GridFightForgeRoleGoodsInfoPb {
+    uint32 RoleId = 1;
+    uint32 Tier = 2;
+}
+
+message GridFightTeamInfoPb {
+    repeated GridFightRoleInfoPb Roles = 1;
+    repeated GridFightNpcInfoPb Npcs = 2;
+    repeated GridFightForgeInfoPb Forges = 3;
+    uint32 CurUniqueId = 4;
+}
+
+message GridFightGameOrbPb {
+    uint32 OrbItemId = 1;
+    uint32 UniqueId = 2;
+}
+
+message GridFightOrbInfoPb {
+    repeated GridFightGameOrbPb Orbs = 1;
+}
+
+message GridFightGameAugmentPb {
+    uint32 AugmentId = 1;
+    map<string, uint32> SavedValues = 2;
+}
+
+message GridFightAugmentInfoPb {
+    repeated GridFightGameAugmentPb Augments = 1;
+}
+
+message GridFightGameTraitEffectPb {
+    uint32 TraitId = 1;
+    uint32 EffectId = 2;
+    oneof EffectParam {
+        uint32 Threshold = 3;
+        uint32 CoreRoleUniqueId = 4;
+    }
+}
+
+message GridFightGameTraitPb {
+    uint32 TraitId = 1;
+    repeated GridFightGameTraitEffectPb Effects = 2;
+    uint32 TraitLayer = 3;
+}
+
+message GridFightTraitInfoPb {
+    repeated GridFightGameTraitPb Traits = 1;
+}
+
+message GridFightEquipmentItemPb {
+    uint32 ItemId = 1;
+    uint32 UniqueId = 2;
+}
+
+message GridFightConsumableItemPb {
+    uint32 ItemId = 1;
+    uint32 Count = 2;
+}
+
+message GridFightItemsInfoPb {
+    repeated GridFightEquipmentItemPb EquipmentItems = 1;
+    repeated GridFightConsumableItemPb ConsumableItems = 2;
+}
+
+message GridFightComponentPb {
+    oneof ComponentType {
+        GridFightShopInfoPb ShopInfo = 1;
+        GridFightBasicInfoPb BasicInfo = 2;
+        GridFightTeamInfoPb TeamInfo = 3;
+        GridFightOrbInfoPb OrbInfo = 4;
+        GridFightAugmentInfoPb AugmentInfo = 5;
+        GridFightTraitInfoPb TraitInfo = 6;
+        GridFightItemsInfoPb ItemsInfo = 7;
+    }
+}
