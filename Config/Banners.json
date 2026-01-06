@@ -1,4 +1,5 @@
 {
+ 
   "Banners": [
     {
       "gachaId": 1001,
@@ -7,11 +8,19 @@
       "endTime": 1924992000,
       "rateUpItems5": [
         23002,
-        1003,
-        1101,
-        1104,
+		1003,
+		1101,
+		1104,
+		1211,
+		1209,
+		1107,
+		1004,
         23000,
-        23003
+        23003,
+		23004,
+		23005,
+		23012,
+		23013
       ],
       "rateUpItems4": [
         1001,
@@ -20,10 +29,8 @@
         1009,
         1013,
         1103,
-        1104,
         1105,
         1106,
-        1107,
         1108,
         1109,
         1110,
@@ -32,9 +39,7 @@
         1202,
         1206,
         1207,
-        1209,
         1210,
-        1211,
         1214,
         1215,
         1301,
@@ -60,22 +65,2406 @@
         21018,
         21019,
         21020,
+		21029,
+		21028,
+		21030,
+		21032,
+		21033,
+		21034,
         21042,
         21043,
-        21044,
-        23004,
-        23005,
-        23012,
-        23013
+        21044
       ]
     },
     {
+      "gachaId": 4001,
+      "gachaType": "Newbie",
+      "beginTime": 0,
+      "endTime": 1924992000,
+      "rateUpItems5": [
+        1003,
+        1004,
+        1101,
+        1104,
+        1107,
+        1209,
+        1211
+      ],
+      "rateUpItems4": [
+        1001,
+        1002,
+        1008,
+        1009,
+        1013,
+        1103,
+        1105,
+        1106,
+        1108,
+        1109,
+        1201,
+        1202,
+        1206,
+        21000,
+        21001,
+        21002,
+        21003,
+        21004,
+        21005,
+        21006,
+        21007,
+        21008,
+        21009,
+        21010,
+        21011,
+        21012,
+        21013,
+        21014,
+        21015,
+        21016,
+        21017,
+        21018,
+        21019,
+        21020
+      ]
+    },
+   {
+      "gachaId": 2001,
+      "gachaType": "AvatarUp",
+      "beginTime": 0,
+      "endTime": 1684339199,
+      "rateUpItems5": [
+        1102 //希尔
+      ],
+      "rateUpItems4": [
+        1105,
+        1106,
+        1109
+      ]
+    },
+    {
+      "gachaId": 3001,
+      "gachaType": "WeaponUp",
+      "beginTime": 0,
+      "endTime": 1684339199,
+      "rateUpItems5": [
+        23001
+      ],
+      "rateUpItems4": [
+        21001,
+        21005,
+        21000
+      ]
+    },
+    {
+      "gachaId": 2002,
+      "gachaType": "AvatarUp",
+      "beginTime": 1684339199,
+      "endTime": 1686034740,
+      "rateUpItems5": [
+        1204 //景元
+      ],
+      "rateUpItems4": [
+        1206,
+        1001,
+        1103
+      ]
+    },
+    {
+      "gachaId": 3002,
+      "gachaType": "WeaponUp",
+      "beginTime": 1684339199,
+      "endTime": 1686034740,
+      "rateUpItems5": [
+        23010
+      ],
+      "rateUpItems4": [
+        21003,
+        21002,
+        21013
+      ]
+    },
+    {
+      "gachaId": 2005,
+      "gachaType": "AvatarUp",
+      "beginTime": 1686034740,
+      "endTime": 1687935540,
+      "rateUpItems5": [
+        1006 //银狼
+      ],
+      "rateUpItems4": [
+        1002,
+        1009,
+        1103
+      ]
+    },
+    {
+      "gachaId": 3005,
+      "gachaType": "WeaponUp",
+      "beginTime": 1686034740,
+      "endTime": 1687935540,
+      "rateUpItems5": [
+        23007
+      ],
+      "rateUpItems4": [
+        21017,
+        21004,
+        21013
+      ]
+    },
+    {
+      "gachaId": 2006,
+      "gachaType": "AvatarUp",
+      "beginTime": 1687935540,
+      "endTime": 1689663540,
+      "rateUpItems5": [
+        1203 //罗刹
+      ],
+      "rateUpItems4": [
+        1106,
+        1201,
+        1207
+      ]
+    },
+    {
+      "gachaId": 3006,
+      "gachaType": "WeaponUp",
+      "beginTime": 1687935540,
+      "endTime": 1689663540,
+      "rateUpItems5": [
+        23008
+      ],
+      "rateUpItems4": [
+        21001,
+        21018,
+        21020
+      ]
+    },
+    {
+      "gachaId": 2007,
+      "gachaType": "AvatarUp",
+      "beginTime": 1689663540,
+      "endTime": 1691564340,
+      "rateUpItems5": [
+        1205 //刃
+      ],
+      "rateUpItems4": [
+        1008,
+        1206,
+        1105
+      ]
+    },
+    {
+      "gachaId": 3007,
+      "gachaType": "WeaponUp",
+      "beginTime": 1689663540,
+      "endTime": 1691564340,
+      "rateUpItems5": [
+        23009
+      ],
+      "rateUpItems4": [
+        21012,
+        21010,
+        21007
+      ]
+    },
+    {
+      "gachaId": 2008,
+      "gachaType": "AvatarUp",
+      "beginTime": 1691564340,
+      "endTime": 1693292340,
+      "rateUpItems5": [
+        1005 //卡芙卡
+      ],
+      "rateUpItems4": [
+        1111,
+        1108,
+        1103
+      ]
+    },
+    {
+      "gachaId": 3008,
+      "gachaType": "WeaponUp",
+      "beginTime": 1691564340,
+      "endTime": 1693292340,
+      "rateUpItems5": [
+        23006
+      ],
+      "rateUpItems4": [
+        21015,
+        21008,
+        21006
+      ]
+    },
+    {
+      "gachaId": 2009,
+      "gachaType": "AvatarUp",
+      "beginTime": 1693292340,
+      "endTime": 1695193140,
+      "rateUpItems5": [
+        1213 //丹恒•饮月
+      ],
+      "rateUpItems4": [
+        1207,
+        1009,
+        1001
+      ]
+    },
+    {
+      "gachaId": 3009,
+      "gachaType": "WeaponUp",
+      "beginTime": 1693292340,
+      "endTime": 1695193140,
+      "rateUpItems5": [
+        23015
+      ],
+      "rateUpItems4": [
+        21011,
+        21018,
+        21009
+      ]
+    },
+    {
+      "gachaId": 2010,
+      "gachaType": "AvatarUp",
+      "beginTime": 1695193140,
+      "endTime": 1696921140,
+      "rateUpItems5": [
+        1208 //符玄
+      ],
+      "rateUpItems4": [
+        1110,
+        1109,
+        1106
+      ]
+    },
+    {
+      "gachaId": 3010,
+      "gachaType": "WeaponUp",
+      "beginTime": 1695193140,
+      "endTime": 1696921140,
+      "rateUpItems5": [
+        23011
+      ],
+      "rateUpItems4": [
+        21016,
+        21014,
+        21019
+      ]
+    },
+    {
+      "gachaId": 2011,//jingliu
+      "gachaType": "AvatarUp",
+      "beginTime": 1696921140,
+      "endTime": 1698389940,
+      "rateUpItems5": [
+        1212 //镜流
+      ],
+      "rateUpItems4": [
+        1202,
+        1201,
+        1108
+      ]
+    },
+    {
+      "gachaId": 3011, 
+      "gachaType": "WeaponUp",
+      "beginTime": 1696921140,
+      "endTime": 1698389940,
+      "rateUpItems5": [
+        23014
+      ],
+      "rateUpItems4": [
+        21008,
+        21004,
+        21013
+      ]
+    },
+    {
+      "gachaId": 2012,
+      "gachaType": "AvatarUp",
+      "beginTime": 1698389940,
+      "endTime": 1699945140,
+      "rateUpItems5": [
+        1112 //托帕&账账
+      ],
+      "rateUpItems4": [
+        1210,
+        1111,
+        1206
+      ]
+    },
+    {
+      "gachaId": 3012,
+      "gachaType": "WeaponUp",
+      "beginTime": 1698389940,
+      "endTime": 1699945140,
+      "rateUpItems5": [
+        23016
+      ],
+      "rateUpItems4": [
+        21003,
+        21018,
+        21015
+      ]
+    },
+    {
+      "gachaId": 2014,
+      "gachaType": "AvatarUp",
+      "beginTime": 1699945140,
+      "endTime": 1701845940,
+      "rateUpItems5": [
+        1217 //藿藿
+      ],
+      "rateUpItems4": [
+        1002,
+        1008,
+        1103
+      ]
+    },
+    {
+      "gachaId": 3014,
+      "gachaType": "WeaponUp",
+      "beginTime": 1699945140,
+      "endTime": 1701845940,
+      "rateUpItems5": [
+        23017
+      ],
+      "rateUpItems4": [
+        21007,
+        21017,
+        21016
+      ]
+    },
+    {
+      "gachaId": 2015,
+      "gachaType": "AvatarUp",
+      "beginTime": 1701845940,
+      "endTime": 1703573940,
+      "rateUpItems5": [
+        1302 //银枝
+      ],
+      "rateUpItems4": [
+        1215,
+        1110,
+        1009
+      ]
+    },
+    {
+      "gachaId": 3015,
+      "gachaType": "WeaponUp",
+      "beginTime": 1701845940,
+      "endTime": 1703573940,
+      "rateUpItems5": [
+        23018
+      ],
+      "rateUpItems4": [
+        21019,
+        21000,
+        21006
+      ]
+    },
+    {
+      "gachaId": 2016,
+      "gachaType": "AvatarUp",
+      "beginTime": 1701845940,
+      "endTime": 1703573940,
+      "rateUpItems5": [
+        1006 //银狼
+      ],
+      "rateUpItems4": [
+        1215,
+        1110,
+        1009
+      ]
+    },
+    {
+      "gachaId": 3016,
+      "gachaType": "WeaponUp",
+      "beginTime": 1701845940,
+      "endTime": 1703573940,
+      "rateUpItems5": [
+        23007
+      ],
+      "rateUpItems4": [
+        21019,
+        21000,
+        21006
+      ]
+    },
+    {
+      "gachaId": 2017,
+      "gachaType": "AvatarUp",
+      "beginTime": 1703573940,
+      "endTime": 1705499078,
+      "rateUpItems5": [
+        1303 //阮•梅
+      ],
+      "rateUpItems4": [
+        1001,
+        1202,
+        1214
+      ]
+    },
+    {
+      "gachaId": 3017,
+      "gachaType": "WeaponUp",
+      "beginTime": 1703573940,
+      "endTime": 1705499078,
+      "rateUpItems5": [
+        23019
+      ],
+      "rateUpItems4": [
+        21002,
+        21011,
+        21012
+      ]
+    },
+    {
+      "gachaId": 2018,
+      "gachaType": "AvatarUp",
+      "beginTime": 1703573940,
+      "endTime": 1705499078,
+      "rateUpItems5": [
+        1205 //刃
+      ],
+      "rateUpItems4": [
+        1001,
+        1202,
+        1214
+      ]
+    },
+    {
+      "gachaId": 3018,
+      "gachaType": "WeaponUp",
+      "beginTime": 1703573940,
+      "endTime": 1705499078,
+      "rateUpItems5": [
+        23009
+      ],
+      "rateUpItems4": [
+        21002,
+        21011,
+        21012
+      ]
+    },
+    {
+      "gachaId": 2019,
+      "gachaType": "AvatarUp",
+      "beginTime": 1705499078,
+      "endTime": 1707125081,
+      "rateUpItems5": [
+        1305 //真理医生
+      ],
+      "rateUpItems4": [
+        1105,
+        1109,
+        1206
+      ]
+    },
+    {
+      "gachaId": 3019,
+      "gachaType": "WeaponUp",
+      "beginTime": 1705499078,
+      "endTime": 1707125081,
+      "rateUpItems5": [
+        23020
+      ],
+      "rateUpItems4": [
+        21003,
+        21009,
+        21014
+      ]
+    },
+    {
+      "gachaId": 2020,
+      "gachaType": "AvatarUp",
+      "beginTime": 1705499078,
+      "endTime": 1707125081,
+      "rateUpItems5": [
+        1005 //卡芙卡
+      ],
+      "rateUpItems4": [
+        1105,
+        1109,
+        1206
+      ]
+    },
+    {
+      "gachaId": 3020,
+      "gachaType": "WeaponUp",
+      "beginTime": 1705499078,
+      "endTime": 1707125081,
+      "rateUpItems5": [
+        23006
+      ],
+      "rateUpItems4": [
+        21003,
+        21009,
+        21014
+      ]
+    },
+    {
+      "gachaId": 2021,
+      "gachaType": "AvatarUp",
+      "beginTime": 1707125081,
+      "endTime": 1707125081,
+      "rateUpItems5": [
+        1307 //黑天鹅
+      ],
+      "rateUpItems4": [
+        1202,
+        1210,
+        1312
+      ]
+    },
+    {
+      "gachaId": 3021,
+      "gachaType": "WeaponUp",
+      "beginTime": 1707125081,
+      "endTime": 1709198681,
+      "rateUpItems5": [
+        23022
+      ],
+      "rateUpItems4": [
+        21015,
+        21018,
+        21042
+      ]
+    },
+    {
+      "gachaId": 2022,
+      "gachaType": "AvatarUp",
+      "beginTime": 1707125081,
+      "endTime": 1709198681,
+      "rateUpItems5": [
+        1213 //丹恒•饮月
+      ],
+      "rateUpItems4": [
+        1202,
+        1210,
+        1312
+      ]
+    },
+    {
+      "gachaId": 3022,
+      "gachaType": "WeaponUp",
+      "beginTime": 1707125081,
+      "endTime": 1709198681,
+      "rateUpItems5": [
+        23015
+      ],
+      "rateUpItems4": [
+        21015,
+        21018,
+        21042
+      ]
+    },
+    {
+      "gachaId": 2023,
+      "gachaType": "AvatarUp",
+      "beginTime": 1709198681,
+      "endTime": 1711436399,
+      "rateUpItems5": [
+        1306 //花火
+      ],
+      "rateUpItems4": [
+        1108,
+        1201,
+        1215
+      ]
+    },
+    {
+      "gachaId": 3023,
+      "gachaType": "WeaponUp",
+      "beginTime": 1709198681,
+      "endTime": 1711436399,
+      "rateUpItems5": [
+        23021
+      ],
+      "rateUpItems4": [
+        21011,
+        21019,
+        21020
+      ]
+    },
+    {
+      "gachaId": 2024,
+      "gachaType": "AvatarUp",
+      "beginTime": 1709198681,
+      "endTime": 1711436399,
+      "rateUpItems5": [
+        1204 //景元
+      ],
+      "rateUpItems4": [
+        1108,
+        1201,
+        1215
+      ]
+    },
+    {
+      "gachaId": 3024,
+      "gachaType": "WeaponUp",
+      "beginTime": 1709198681,
+      "endTime": 1711436399,
+      "rateUpItems5": [
+        23010
+      ],
+      "rateUpItems4": [
+        21011,
+        21019,
+        21020
+      ]
+    },
+    {
+      "gachaId": 2025,
+      "gachaType": "AvatarUp",
+      "beginTime": 1711436399,
+      "endTime": 1713337199,
+      "rateUpItems5": [
+        1308 //黄泉
+      ],
+      "rateUpItems4": [
+        1301,
+        1106,
+        1002
+      ]
+    },
+    {
+      "gachaId": 3025,
+      "gachaType": "WeaponUp",
+      "beginTime": 1711436399,
+      "endTime": 1713337199,
+      "rateUpItems5": [
+        23024
+      ],
+      "rateUpItems4": [
+        21001,
+        21000,
+        21017
+      ]
+    },
+    {
+      "gachaId": 2027,
+      "gachaType": "AvatarUp",
+      "beginTime": 1713337199,
+      "endTime": 1715065199,
+      "rateUpItems5": [
+        1304 //砂金
+      ],
+      "rateUpItems4": [
+        1110,
+        1111,
+        1103
+      ]
+    },
+    {
+      "gachaId": 3027,
+      "gachaType": "WeaponUp",
+      "beginTime": 1713337199,
+      "endTime": 1715065199,
+      "rateUpItems5": [
+        23023
+      ],
+      "rateUpItems4": [
+        21043,
+        21013,
+        21007
+      ]
+    },
+    {
+      "gachaId": 2028,
+      "gachaType": "AvatarUp",
+      "beginTime": 1713337199,
+      "endTime": 1715065199,
+      "rateUpItems5": [
+        1212 //镜流
+      ],
+      "rateUpItems4": [
+        1215,
+        1214,
+        1001
+      ]
+    },
+    {
+      "gachaId": 3028,
+      "gachaType": "WeaponUp",
+      "beginTime": 1713337199,
+      "endTime": 1715065199,
+      "rateUpItems5": [
+        23014
+      ],
+      "rateUpItems4": [
+        21043,
+        21019,
+        21031
+      ]
+    },
+    {
+      "gachaId": 2029,
+      "gachaType": "AvatarUp",
+      "beginTime": 1715065199,
+      "endTime": 1716965999,
+      "rateUpItems5": [
+        1309 //知更鸟
+      ],
+      "rateUpItems4": [
+        1001,
+        1214,
+        1215
+      ]
+    },
+    {
+      "gachaId": 3029,
+      "gachaType": "WeaponUp",
+      "beginTime": 1715065199,
+      "endTime": 1716965999,
+      "rateUpItems5": [
+        23026
+      ],
+      "rateUpItems4": [
+        21044,
+        21010,
+        21014
+      ]
+    },
+    {
+      "gachaId": 2031,
+      "gachaType": "AvatarUp",
+      "beginTime": 1716965999,
+      "endTime": 1718693999,
+      "rateUpItems5": [
+        1315 //波提欧
+      ],
+      "rateUpItems4": [
+        1106,
+        1111,
+        1109
+      ]
+    },
+    {
+      "gachaId": 3031,
+      "gachaType": "WeaponUp",
+      "beginTime": 1716965999,
+      "endTime": 1718693999,
+      "rateUpItems5": [
+        23027
+      ],
+      "rateUpItems4": [
+        21020,
+        21012,
+        21009
+      ]
+    },
+    {
+      "gachaId": 2033,
+      "gachaType": "AvatarUp",
+      "beginTime": 1718693999,
+      "endTime": 1720594799,
+      "rateUpItems5": [
+        1310 //流萤
+      ],
+      "rateUpItems4": [
+        1214,
+        1301,
+        1312
+      ]
+    },
+    {
+      "gachaId": 3033,
+      "gachaType": "WeaponUp",
+      "beginTime": 1718693999,
+      "endTime": 1720594799,
+      "rateUpItems5": [
+        23025
+      ],
+      "rateUpItems4": [
+        21002,
+        21004,
+        21008
+      ]
+    },
+    {
+      "gachaId": 2035,
+      "gachaType": "AvatarUp",
+      "beginTime": 1720594799,
+      "endTime": 1722322799,
+      "rateUpItems5": [
+        1314 //翡翠
+      ],
+      "rateUpItems4": [
+        1009,
+        1103,
+        1105
+      ]
+    },
+    {
+      "gachaId": 3035,
+      "gachaType": "WeaponUp",
+      "beginTime": 1720594799,
+      "endTime": 1722322799,
+      "rateUpItems5": [
+        23028
+      ],
+      "rateUpItems4": [
+        21007,
+        21016,
+        21045
+      ]
+    },
+	{
+      "gachaId": 2037,
+      "gachaType": "AvatarUp",
+      "beginTime": 1722322799,
+      "endTime": 1724223599,
+      "rateUpItems5": [
+        1221 //云璃
+      ],
+      "rateUpItems4": [
+        1215,
+        1207,
+        1110
+      ]
+    },
+    {
+      "gachaId": 3037,
+      "gachaType": "WeaponUp",
+      "beginTime": 1722322799,
+      "endTime": 1724223599,
+      "rateUpItems5": [
+        23030
+      ],
+      "rateUpItems4": [
+        21005,
+        21014,
+        21006
+      ]
+    },
+	{
+      "gachaId": 2039,
+      "gachaType": "AvatarUp",
+      "beginTime": 1724223599,
+      "endTime": 1725865199,
+      "rateUpItems5": [
+        1218 //椒丘
+      ],
+      "rateUpItems4": [
+        1109,
+        1210,
+        1008
+      ]
+    },
+    {
+      "gachaId": 3039,
+      "gachaType": "WeaponUp",
+      "beginTime": 1724223599,
+      "endTime": 1725865199,
+      "rateUpItems5": [
+        23029
+      ],
+      "rateUpItems4": [
+        21046,
+        21008,
+        21012
+      ]
+    },
+	{
+      "gachaId": 2041,
+      "gachaType": "AvatarUp",
+      "beginTime": 1725865199,
+      "endTime": 1727852399,
+      "rateUpItems5": [
+        1220 //飞霄
+      ],
+      "rateUpItems4": [
+        1223,
+        1009,
+        1111
+      ]
+    },
+    {
+      "gachaId": 3041,
+      "gachaType": "WeaponUp",
+      "beginTime": 1725865199,
+      "endTime": 1727852399,
+      "rateUpItems5": [
+        23031
+      ],
+      "rateUpItems4": [
+	    21010,
+        21015,
+	    21006
+      ]
+    },
+	{
+      "gachaId": 2044,
+      "gachaType": "AvatarUp",
+      "beginTime": 1725865199,
+      "endTime": 1727852399,
+      "rateUpItems5": [
+        1005 //卡芙卡
+      ],
+      "rateUpItems4": [
+        1223,
+        1009,
+        1111
+      ]
+    },
+    {
+      "gachaId": 3044,
+      "gachaType": "WeaponUp",
+      "beginTime": 1725865199,
+      "endTime": 1727852399,
+      "rateUpItems5": [
+        23006
+      ],
+      "rateUpItems4": [
+        21015,
+        21006,
+        21010
+      ]
+    },
+    {
+      "gachaId": 2043,
+      "gachaType": "AvatarUp",
+      "beginTime": 1725865199,
+      "endTime": 1727852399,
+      "rateUpItems5": [
+        1307 //黑天鹅
+      ],
+      "rateUpItems4": [
+        1223,
+        1009,
+        1111
+      ]
+    },
+    {
+      "gachaId": 3043,
+      "gachaType": "WeaponUp",
+      "beginTime": 1725865199,
+      "endTime": 1727852399,
+      "rateUpItems5": [
+        23022
+      ],
+      "rateUpItems4": [
+        21015,
+        21006,
+        21010
+      ]
+    },
+   {
+      "gachaId": 2042,
+      "gachaType": "AvatarUp",
+      "beginTime": 1725865199,
+      "endTime": 1727852399,
+      "rateUpItems5": [
+        1309 //知更鸟
+      ],
+      "rateUpItems4": [
+        1223,
+        1009,
+        1111
+      ]
+    },
+    {
+      "gachaId": 3042,
+      "gachaType": "WeaponUp",
+      "beginTime": 1725865199,
+      "endTime": 1727852399,
+      "rateUpItems5": [
+        23026
+      ],
+      "rateUpItems4": [
+        21015,
+        21006,
+        21010
+      ]
+    },
+	{
+      "gachaId": 2045,
+      "gachaType": "AvatarUp",
+      "beginTime": 1727852399,
+      "endTime": 1729580399,
+      "rateUpItems5": [
+        1222 //灵砂
+      ],
+      "rateUpItems4": [
+        1312,
+        1105,
+        1210
+      ]
+    },
+    {
+      "gachaId": 3045,
+      "gachaType": "WeaponUp",
+      "beginTime": 1727852399,
+      "endTime": 1729580399,
+      "rateUpItems5": [
+        23032
+      ],
+      "rateUpItems4": [
+        21047,
+        21007,
+        21011
+      ]
+    },
+	{
+      "gachaId": 2046,
+      "gachaType": "AvatarUp",
+      "beginTime": 1727852399,
+      "endTime": 1729580399,
+      "rateUpItems5": [
+        1112 //托帕&账账
+      ],
+      "rateUpItems4": [
+        1312,
+        1105,
+        1210
+      ]
+    },
+    {
+      "gachaId": 3046,
+      "gachaType": "WeaponUp",
+      "beginTime": 1727852399,
+      "endTime": 1729580399,
+      "rateUpItems5": [
+        23016
+      ],
+      "rateUpItems4": [
+        21047,
+        21007,
+        21011
+      ]
+    },
+   {
+      "gachaId": 2047,
+      "gachaType": "AvatarUp",
+      "beginTime": 1729580399,
+      "endTime": 1731505283,
+      "rateUpItems5": [
+        1317 //乱破
+      ],
+      "rateUpItems4": [
+        1110,
+        1214,
+        1207
+      ]
+    },
+    {
+      "gachaId": 3047,
+      "gachaType": "WeaponUp",
+      "beginTime": 1729580399,
+      "endTime": 1731505283,
+      "rateUpItems5": [
+        23033
+      ],
+      "rateUpItems4": [
+        21048,
+        21045,
+        21019
+      ]
+    },
+	{
+      "gachaId": 2048,
+      "gachaType": "AvatarUp",
+      "beginTime": 1729580399,
+      "endTime": 1731505283,
+      "rateUpItems5": [
+        1213 //饮月
+      ],
+      "rateUpItems4": [
+        1110,
+        1214,
+        1207
+      ]
+    },
+    {
+      "gachaId": 3048,
+      "gachaType": "WeaponUp",
+      "beginTime": 1729580399,
+      "endTime": 1731505283,
+      "rateUpItems5": [
+        23015
+      ],
+      "rateUpItems4": [
+        21048,
+        21045,
+        21019
+      ]
+    },
+	{
+      "gachaId": 2049,
+      "gachaType": "AvatarUp",
+      "beginTime": 1731505283,
+      "endTime": 1733233283,
+      "rateUpItems5": [
+        1308 //黄泉
+      ],
+      "rateUpItems4": [
+        1001,
+        1106,
+        1108
+      ]
+    },
+    {
+      "gachaId": 3049,
+      "gachaType": "WeaponUp",
+      "beginTime": 1731505283,
+      "endTime": 1733233283,
+      "rateUpItems5": [
+        23024
+      ],
+      "rateUpItems4": [
+        21002,
+        21044,
+        21013
+      ]
+    },
+	{
+      "gachaId": 2050,
+      "gachaType": "AvatarUp",
+      "beginTime": 1731505283,
+      "endTime": 1733233283,
+      "rateUpItems5": [
+        1304 //砂金
+      ],
+      "rateUpItems4": [
+        1001,
+        1106,
+        1108
+      ]
+    },
+    {
+      "gachaId": 3050,
+      "gachaType": "WeaponUp",
+      "beginTime": 1731505283,
+      "endTime": 1733233283,
+      "rateUpItems5": [
+        23023
+      ],
+      "rateUpItems4": [
+        21002,
+        21044,
+        21013
+      ]
+    },
+	 {
+      "gachaId": 2051,
+      "gachaType": "AvatarUp",
+      "beginTime": 1733233283,
+      "endTime": 1735099200,
+      "rateUpItems5": [
+        1313 //星期日
+      ],
+      "rateUpItems4": [
+        1201,
+        1008,
+        1202
+      ]
+    },
+    {
+      "gachaId": 3051,
+      "gachaType": "WeaponUp",
+      "beginTime": 1733233283,
+      "endTime": 1735099200,
+      "rateUpItems5": [
+        23034
+      ],
+      "rateUpItems4": [
+        21046,
+		21006,
+		21010
+      ]
+    },
+	{
+      "gachaId": 2052,
+      "gachaType": "AvatarUp",
+      "beginTime": 1733233283,
+      "endTime": 1735099200,
+      "rateUpItems5": [
+        1204 //景元
+      ],
+      "rateUpItems4": [
+        1201,
+		1008,
+		1202
+      ]
+    },
+    {
+      "gachaId": 3052,
+      "gachaType": "WeaponUp",
+      "beginTime": 1733233283,
+      "endTime": 1735099200,
+      "rateUpItems5": [
+        23034
+      ],
+      "rateUpItems4": [
+        21046,
+		21006,
+		21010
+      ]
+    },
+	{
+      "gachaId": 2053,
+      "gachaType": "AvatarUp",
+      "beginTime": 1735099201,
+      "endTime": 1736838000,
+      "rateUpItems5": [
+        1225 //忘归人
+      ],
+      "rateUpItems4": [
+        1301,
+		1312,
+		1207
+      ]
+    },
+    {
+      "gachaId": 3053,
+      "gachaType": "WeaponUp",
+      "beginTime": 1735099201,
+      "endTime": 1736838000,
+      "rateUpItems5": [
+        23035
+      ],
+      "rateUpItems4": [
+        21043,
+		21042,
+		21015
+      ]
+    },
+	{
+      "gachaId": 2054,
+      "gachaType": "AvatarUp",
+      "beginTime": 1735099201,
+      "endTime": 1736838000,
+      "rateUpItems5": [
+        1310 //流萤
+      ],
+      "rateUpItems4": [
+        1301,
+		1312,
+		1207
+      ]
+    },
+    {
+      "gachaId": 3054,
+      "gachaType": "WeaponUp",
+      "beginTime": 1735099201,
+      "endTime": 1736838000,
+      "rateUpItems5": [
+        23025
+      ],
+      "rateUpItems4": [
+        21043,
+		21042,
+		21015
+      ]
+    },
+    {
+      "gachaId": 2056,
+      "gachaType": "AvatarUp",
+      "beginTime": 1736893800,
+      "endTime": 1738727940,
+      "rateUpItems5": [
+        1222//灵砂
+      ],
+      "rateUpItems4": [
+        1009,
+        1105,
+        1223
+      ]
+    },
+    {
+      "gachaId": 3055,
+      "gachaType": "WeaponUp",
+      "beginTime": 1736893800,
+      "endTime": 1738727940,
+      "rateUpItems5": [
+        23037
+      ],
+      "rateUpItems4": [
+        21003,
+        21009,
+        21020
+      ]
+    },
+    {
+      "gachaId": 2055,
+      "gachaType": "AvatarUp",
+      "beginTime": 1736893800,
+      "endTime": 1738727940,
+      "rateUpItems5": [
+        1401//大黑塔
+      ],
+      "rateUpItems4": [
+        1009,
+        1105,
+        1223
+      ]
+    },
+    {
+      "gachaId": 3056,
+      "gachaType": "WeaponUp",
+      "beginTime": 1736893800,
+      "endTime": 1738727940,
+      "rateUpItems5": [
+        23032
+      ],
+      "rateUpItems4": [
+        21003,
+        21009,
+        21020
+      ]
+    },
+    {
+      "gachaId": 2057,
+      "gachaType": "AvatarUp",
+      "beginTime": 1736893800,
+      "endTime": 1738727940,
+      "rateUpItems5": [
+        1220//飞霄
+      ],
+      "rateUpItems4": [
+        1009,
+        1105,
+        1223
+      ]
+    },
+    {
+      "gachaId": 3057,
+      "gachaType": "WeaponUp",
+      "beginTime": 1736893800,
+      "endTime": 1738727940,
+      "rateUpItems5": [
+        23031
+      ],
+      "rateUpItems4": [
+        21003,
+        21009,
+        21020
+      ]
+    },
+    {
+      "gachaId": 2058,
+      "gachaType": "AvatarUp",
+      "beginTime": 1736893800,
+      "endTime": 1738727940,
+      "rateUpItems5": [
+        1314//翡翠
+      ],
+      "rateUpItems4": [
+        1009,
+        1105,
+        1223
+      ]
+    },
+    {
+      "gachaId": 3058,
+      "gachaType": "WeaponUp",
+      "beginTime": 1736893800,
+      "endTime": 1738727940,
+      "rateUpItems5": [
+        23028
+      ],
+      "rateUpItems4": [
+        21003,
+        21009,
+        21020
+      ]
+    },
+    {
+      "gachaId": 2062,
+      "gachaType": "AvatarUp",
+      "beginTime": 1738728000,
+      "endTime": 1740466800,
+      "rateUpItems5": [
+        1006//银狼
+      ],
+      "rateUpItems4": [
+        1202,
+        1206,
+        1215
+      ]
+    },
+    {
+      "gachaId": 3062,
+      "gachaType": "WeaponUp",
+      "beginTime": 1738728000,
+      "endTime": 1740466800,
+      "rateUpItems5": [
+        23007
+      ],
+      "rateUpItems4": [
+        21017,
+        21018,
+        21051
+      ]
+    },
+    {
+      "gachaId": 2061,
+      "gachaType": "AvatarUp",
+      "beginTime": 1738728000,
+      "endTime": 1740466800,
+      "rateUpItems5": [
+        1309//知更鸟
+      ],
+      "rateUpItems4": [
+        1202,
+        1206,
+        1215
+      ]
+    },
+    {
+      "gachaId": 3061,
+      "gachaType": "WeaponUp",
+      "beginTime": 1738728000,
+      "endTime": 1740466800,
+      "rateUpItems5": [
+        23026
+      ],
+      "rateUpItems4": [
+        21017,
+        21018,
+        21051
+      ]
+    },
+    {
+      "gachaId": 2060,
+      "gachaType": "AvatarUp",
+      "beginTime": 1738728000,
+      "endTime": 1740466800,
+      "rateUpItems5": [
+        1315//波提欧
+      ],
+      "rateUpItems4": [
+        1202,
+        1206,
+        1215
+      ]
+    },
+    {
+      "gachaId": 3060,
+      "gachaType": "WeaponUp",
+      "beginTime": 1738728000,
+      "endTime": 1740466800,
+      "rateUpItems5": [
+        23027
+      ],
+      "rateUpItems4": [
+        21017,
+        21018,
+        21051
+      ]
+    },
+    {
+      "gachaId": 2059,
+      "gachaType": "AvatarUp",
+      "beginTime": 1738728000,
+      "endTime": 1740466800,
+      "rateUpItems5": [
+        1402//阿格莱雅
+      ],
+      "rateUpItems4": [
+        1202,
+        1206,
+        1215
+      ]
+    },
+    {
+      "gachaId": 3059,
+      "gachaType": "WeaponUp",
+      "beginTime": 1738728000,
+      "endTime": 1740466800,
+      "rateUpItems5": [
+        23036
+      ],
+      "rateUpItems4": [
+        21017,
+        21018,
+        21051
+      ]
+    },
+	{
+      "gachaId": 2063,
+      "gachaType": "AvatarUp",
+      "beginTime": 1740522600,
+      "endTime": 1742356740,
+      "rateUpItems5": [
+        1403//缇宝
+      ],
+      "rateUpItems4": [
+        1109,
+        1110,
+        1210
+      ]
+    },
+    {
+      "gachaId": 3063,
+      "gachaType": "WeaponUp",
+      "beginTime": 1740522600,
+      "endTime": 1742356740,
+      "rateUpItems5": [
+        23038
+      ],
+      "rateUpItems4": [
+        21000,
+        21011,
+        21016
+      ]
+    },
+	{
+      "gachaId": 2064,
+      "gachaType": "AvatarUp",
+      "beginTime": 1740522600,
+      "endTime": 1742356740,
+      "rateUpItems5": [
+        1221//云璃
+      ],
+      "rateUpItems4": [
+        1109,
+        1110,
+        1210
+      ]
+    },
+    {
+      "gachaId": 3064,
+      "gachaType": "WeaponUp",
+      "beginTime": 1740522600,
+      "endTime": 1742356740,
+      "rateUpItems5": [
+        23030
+      ],
+      "rateUpItems4": [
+        21000,
+        21011,
+        21016
+      ]
+    },
+	{
+      "gachaId": 2066,
+      "gachaType": "AvatarUp",
+      "beginTime": 1742356800,
+      "endTime": 1744095600,
+      "rateUpItems5": [
+        1217//藿藿
+      ],
+      "rateUpItems4": [
+        1008,
+        1105,
+        1214
+      ]
+    },
+    {
+      "gachaId": 3066,
+      "gachaType": "WeaponUp",
+      "beginTime": 1742356800,
+      "endTime": 1744095600,
+      "rateUpItems5": [
+        23017
+      ],
+      "rateUpItems4": [
+        21004,
+        21012,
+        21014
+      ]
+    },
+	{
+      "gachaId": 2065,
+      "gachaType": "AvatarUp",
+      "beginTime": 1742356800,
+      "endTime": 1744095600,
+      "rateUpItems5": [
+        1404//万敌
+      ],
+      "rateUpItems4": [
+        1008,
+        1105,
+        1214
+      ]
+    },
+    {
+      "gachaId": 3065,
+      "gachaType": "WeaponUp",
+      "beginTime": 1742356800,
+      "endTime": 1744095600,
+      "rateUpItems5": [
+        23039
+      ],
+      "rateUpItems4": [
+        21004,
+        21012,
+        21014
+      ]
+    },
+	{
+      "gachaId": 2067,
+      "gachaType": "AvatarUp",
+      "beginTime": 1744192800,
+      "endTime": 1746007200,
+      "rateUpItems5": [
+        1407//遐蝶
+      ],
+      "rateUpItems4": [
+        1106,
+        1110,
+        1301
+      ]
+    },
+    {
+      "gachaId": 3067,
+      "gachaType": "WeaponUp",
+      "beginTime": 1744192800,
+      "endTime": 1746007200,
+      "rateUpItems5": [
+        23040
+      ],
+      "rateUpItems4": [
+        21001,
+        21044,
+        21000
+      ]
+    },
+	{
+      "gachaId": 2068,
+      "gachaType": "AvatarUp",
+      "beginTime": 1744192800,
+      "endTime": 1746007200,
+      "rateUpItems5": [
+        1225//忘归人
+      ],
+      "rateUpItems4": [
+        1106,
+        1110,
+        1301
+      ]
+    },
+    {
+      "gachaId": 3068,
+      "gachaType": "WeaponUp",
+      "beginTime": 1744192800,
+      "endTime": 1746007200,
+      "rateUpItems5": [
+        23035
+      ],
+      "rateUpItems4": [
+        21001,
+        21044,
+        21000
+      ]
+    },
+	{
+      "gachaId": 2069,
+      "gachaType": "AvatarUp",
+      "beginTime": 1744192800,
+      "endTime": 1746007200,
+      "rateUpItems5": [
+        1218//椒丘
+      ],
+      "rateUpItems4": [
+        1106,
+        1110,
+        1301
+      ]
+    },
+    {
+      "gachaId": 3069,
+      "gachaType": "WeaponUp",
+      "beginTime": 1744192800,
+      "endTime": 1746007200,
+      "rateUpItems5": [
+        23029
+      ],
+      "rateUpItems4": [
+        21001,
+        21044,
+        21000
+      ]
+    },
+	{
+      "gachaId": 2070,
+      "gachaType": "AvatarUp",
+      "beginTime": 1744192800,
+      "endTime": 1746007200,
+      "rateUpItems5": [
+        1308//黄泉
+      ],
+      "rateUpItems4": [
+        1106,
+        1110,
+        1301
+      ]
+    },
+    {
+      "gachaId": 3070,
+      "gachaType": "WeaponUp",
+      "beginTime": 1744192800,
+      "endTime": 1746007200,
+      "rateUpItems5": [
+        23024
+      ],
+      "rateUpItems4": [
+        21001,
+        21044,
+        21000
+      ]
+    },
+	{
+      "gachaId": 2071,
+      "gachaType": "AvatarUp",
+      "beginTime": 1745985540,
+      "endTime": 1747713540,
+      "rateUpItems5": [
+        1405//那刻夏
+      ],
+      "rateUpItems4": [
+        1002,
+        1103,
+        1223
+      ]
+    },
+    {
+      "gachaId": 3071,
+      "gachaType": "WeaponUp",
+      "beginTime": 1745985540,
+      "endTime": 1747713540,
+      "rateUpItems5": [
+        23041
+      ],
+      "rateUpItems4": [
+        21016,
+        21045,
+        21005
+      ]
+    },
+	{
+      "gachaId": 2072,
+      "gachaType": "AvatarUp",
+      "beginTime": 1745985540,
+      "endTime": 1747713540,
+      "rateUpItems5": [
+        1305//真理医生
+      ],
+      "rateUpItems4": [
+        1002,
+        1103,
+        1223
+      ]
+    },
+    {
+      "gachaId": 3072,
+      "gachaType": "WeaponUp",
+      "beginTime": 1747713540,
+      "endTime": 1747713540,
+      "rateUpItems5": [
+        23020
+      ],
+      "rateUpItems4": [
+        21016,
+        21045,
+        21005
+      ]
+    },
+	{
+      "gachaId": 2073,
+      "gachaType": "AvatarUp",
+      "beginTime": 1747713540,
+      "endTime": 1749614340,
+      "rateUpItems5": [
+        1409//风堇
+      ],
+      "rateUpItems4": [
+        1312,
+        1103,
+        1105
+      ]
+    },
+    {
+      "gachaId": 3073,
+      "gachaType": "WeaponUp",
+      "beginTime": 1747713540,
+      "endTime": 1749614340,
+      "rateUpItems5": [
+        23042
+      ],
+      "rateUpItems4": [
+        21013,
+        21047,
+        21002
+      ]
+    },
+	{
+      "gachaId": 2074,
+      "gachaType": "AvatarUp",
+      "beginTime": 1747713540,
+      "endTime": 1749614340,
+      "rateUpItems5": [
+        1401//大黑塔
+      ],
+      "rateUpItems4": [
+        1312,
+        1103,
+        1105
+      ]
+    },
+	{
+      "gachaId": 3074,
+      "gachaType": "WeaponUp",
+      "beginTime": 1747713540,
+      "endTime": 1749614340,
+      "rateUpItems5": [
+        23042
+      ],
+      "rateUpItems4": [
+        21013,
+        21047,
+        21002
+      ]
+    },
+	{
+      "gachaId": 2075,
+      "gachaType": "AvatarUp",
+      "beginTime": 1749614340,
+      "endTime": 1751342340,
+      "rateUpItems5": [
+        1406//赛飞儿
+      ],
+      "rateUpItems4": [
+        1201,
+        1214,
+        1206
+      ]
+    },
+    {
+      "gachaId": 3075,
+      "gachaType": "WeaponUp",
+      "beginTime": 1749614340,
+      "endTime": 1751342340,
+      "rateUpItems5": [
+        21051
+      ],
+      "rateUpItems4": [
+        21020,
+		21008,
+        21007
+      ]
+    },
+	{
+      "gachaId": 2076,
+      "gachaType": "AvatarUp",
+      "beginTime": 1749614340,
+      "endTime": 1751342340,
+      "rateUpItems5": [
+        1402//阿格莱雅
+      ],
+      "rateUpItems4": [
+        1201,
+        1214,
+        1206
+      ]
+    },
+    {
+      "gachaId": 3076,
+      "gachaType": "WeaponUp",
+      "beginTime": 1749614340,
+      "endTime": 1751342340,
+      "rateUpItems5": [
+        23036
+      ],
+      "rateUpItems4": [
+        21020,
+		21008,
+        21007
+      ]
+    },
+	{
+      "gachaId": 2077,
+      "gachaType": "AvatarUp",
+      "beginTime": 1751342340,
+      "endTime": 1753243140,
+      "rateUpItems5": [
+        1408//白厄
+      ],
+      "rateUpItems4": [
+        1202,
+        1001,
+        1207
+      ]
+    },
+    {
+      "gachaId": 3077,
+      "gachaType": "WeaponUp",
+      "beginTime": 1751342340,
+      "endTime": 1753243140,
+      "rateUpItems5": [
+        23044
+      ],
+      "rateUpItems4": [
+        21054,
+		21011,
+        21019
+      ]
+    },
+	{
+      "gachaId": 2078,
+      "gachaType": "AvatarUp",
+      "beginTime": 1751342340,
+      "endTime": 1753243140,
+      "rateUpItems5": [
+        1403//缇宝
+      ],
+      "rateUpItems4": [
+        1202,
+        1001,
+        1207
+      ]
+    },
+    {
+      "gachaId": 3078,
+      "gachaType": "WeaponUp",
+      "beginTime": 1751342340,
+      "endTime": 1753243140,
+      "rateUpItems5": [
+        23038
+      ],
+      "rateUpItems4": [
+        21054,
+		21011,
+        21019
+      ]
+    },
+	{
+      "gachaId": 2079,
+      "gachaType": "AvatarUp",
+      "beginTime": 1751342340,
+      "endTime": 1753243140,
+      "rateUpItems5": [
+        1313//星期日
+      ],
+      "rateUpItems4": [
+        1202,
+        1001,
+        1207
+      ]
+    },
+    {
+      "gachaId": 3079,
+      "gachaType": "WeaponUp",
+      "beginTime": 1751342340,
+      "endTime": 1753243140,
+      "rateUpItems5": [
+        23034
+      ],
+      "rateUpItems4": [
+        21054,
+		21011,
+        21019
+      ]
+    },
+	{
+      "gachaId": 2080,
+      "gachaType": "AvatarUp",
+      "beginTime": 1751342340,
+      "endTime": 1753243140,
+      "rateUpItems5": [
+        1306//花火
+      ],
+      "rateUpItems4": [
+        1202,
+        1001,
+        1207
+      ]
+    },
+    {
+      "gachaId": 3080,
+      "gachaType": "WeaponUp",
+      "beginTime": 1751342340,
+      "endTime": 1753243140,
+      "rateUpItems5": [
+        23021
+      ],
+      "rateUpItems4": [
+        21054,
+		21011,
+        21019
+      ]
+    },
+	// ============================
+    // 【3.4 下半】流萤 / 镜流 / 刃
+    // ============================
+
+    // 流萤（复刻）
+    {
+      gachaId: 2081,
+      gachaType: "AvatarUp",
+      beginTime: 1753243200, // 2025-07-23 12:00:00
+      endTime: 1754982000,   // 2025-08-12 15:00:00
+      rateUpItems5: [
+        1310, // 流萤
+      ],
+      rateUpItems4: [
+        1215, // 寒鸦
+        1110, // 玲可
+        1111  // 卢卡
+      ]
+    },
+
+    // 流萤专武
+    {
+      gachaId: 3081,
+      gachaType: "WeaponUp",
+      beginTime: 1753243200,
+      endTime: 1754982000,
+      rateUpItems5: [
+        23025, // 梦应归于何处
+      ],
+      rateUpItems4: [
+        21012, // 秘密誓心
+        21017, // 点个关注吧！
+        21015  // 决心如汗珠般闪耀
+      ]
+    },
+
+    // 镜流（复刻）
+    {
+      gachaId: 2082,
+      gachaType: "AvatarUp",
+      beginTime: 1753243200,
+      endTime: 1754982000,
+      rateUpItems5: [
+        1212, // 镜流
+      ],
+      rateUpItems4: [
+        1215, // 寒鸦
+        1110, // 玲可
+        1111  // 卢卡
+      ]
+    },
+
+    // 镜流专武
+    {
+      gachaId: 3082,
+      gachaType: "WeaponUp",
+      beginTime: 1753243200,
+      endTime: 1754982000,
+      rateUpItems5: [
+        23014, // 此身为剑
+      ],
+      rateUpItems4: [
+        21012, // 秘密誓心
+        21017, // 点个关注吧！
+        21015  // 决心如汗珠般闪耀
+      ]
+    },
+
+    // 刃（复刻）
+    {
+      gachaId: 2083,
+      gachaType: "AvatarUp",
+      beginTime: 1753243200,
+      endTime: 1754982000,
+      rateUpItems5: [
+        1205, // 刃
+      ],
+      rateUpItems4: [
+        1215, // 寒鸦
+        1110, // 玲可
+        1111  // 卢卡
+      ]
+    },
+
+    // 刃专武
+    {
+      gachaId: 3083,
+      gachaType: "WeaponUp",
+      beginTime: 1753243200,
+      endTime: 1754982000,
+      rateUpItems5: [
+        23009, // 到不了的彼岸
+      ],
+      rateUpItems4: [
+        21012, // 秘密誓心
+        21017, // 点个关注吧！
+        21015  // 决心如汗珠般闪耀
+      ]
+    },
+
+    // ============================
+    // 【3.5 上半】海瑟音 / 卡芙卡
+    // ============================
+
+    // 海瑟音（新角色）
+    {
+      gachaId: 2084,
+      gachaType: "AvatarUp",
+      beginTime: 1755054000, // 2025-08-13 11:00:00 (版本更新)
+      endTime: 1756785540,   // 2025-09-02 11:59:00
+      rateUpItems5: [
+        1410, // 海瑟音
+      ],
+      rateUpItems4: [
+        1009, // 艾丝妲
+        1008, // 阿兰
+        1109  // 虎克
+      ]
+    },
+
+    // 海瑟音专武
+    {
+      gachaId: 3084,
+      gachaType: "WeaponUp",
+      beginTime: 1755054000,
+      endTime: 1756785540,
+      rateUpItems5: [
+        23047, // 海洋为何而歌
+      ],
+      rateUpItems4: [
+        21008, // 猎物的视线
+        21046, // 芳华待灼
+        21042  // 铭记于心的约定
+      ]
+    },
+
+    // 卡芙卡（复刻）
+    {
+      gachaId: 2085,
+      gachaType: "AvatarUp",
+      beginTime: 1755054000,
+      endTime: 1756785540,
+      rateUpItems5: [
+        1005, // 卡芙卡
+      ],
+      rateUpItems4: [
+        1009, // 艾丝妲
+        1008, // 阿兰
+        1109  // 虎克
+      ]
+    },
+
+    // 卡芙卡专武
+    {
+      gachaId: 3085,
+      gachaType: "WeaponUp",
+      beginTime: 1755054000,
+      endTime: 1756785540,
+      rateUpItems5: [
+        23006, // 只需等待
+      ],
+      rateUpItems4: [
+        21008, // 猎物的视线
+        21046, // 芳华待灼
+        21042  // 铭记于心的约定
+      ]
+    },
+
+    // ============================
+    // 【3.5 下半】刻律德菈 / 银狼
+    // ============================
+
+    // 刻律德菈（新角色）
+    {
+      gachaId: 2086,
+      gachaType: "AvatarUp",
+      beginTime: 1756785600, // 2025-09-02 12:00:00
+      endTime: 1758610800,   // 2025-09-23 15:00:00
+      rateUpItems5: [
+        1412, // 刻律德菈
+      ],
+      rateUpItems4: [
+        1108, // 桑博
+        1201, // 青雀
+        1002  // 丹恒
+      ]
+    },
+
+    // 刻律德菈专武
+    {
+      gachaId: 3086,
+      gachaType: "WeaponUp",
+      beginTime: 1756785600,
+      endTime: 1758610800,
+      rateUpItems5: [
+        23048, // 金血铭刻的时代
+      ],
+      rateUpItems4: [
+        21006, // 「我」的诞生
+        21010, // 论剑
+        21001  // 晚安与睡颜
+      ]
+    },
+
+    // 银狼（复刻）
+    {
+      gachaId: 2087,
+      gachaType: "AvatarUp",
+      beginTime: 1756785600,
+      endTime: 1758610800,
+      rateUpItems5: [
+        1006, // 银狼
+      ],
+      rateUpItems4: [
+        1108, // 桑博
+        1201, // 青雀
+        1002  // 丹恒
+      ]
+    },
+
+    // 银狼专武
+    {
+      gachaId: 3087,
+      gachaType: "WeaponUp",
+      beginTime: 1756785600,
+      endTime: 1758610800,
+      rateUpItems5: [
+        23007, // 雨一直下
+      ],
+      rateUpItems4: [
+        21006, // 「我」的诞生
+        21010, // 论剑
+        21001  // 晚安与睡颜
+      ]
+    },
+
+    // ============================
+    // 【3.6 上半】长夜月 / 大黑塔
+    // ============================
+
+    // 长夜月（新角色）
+    {
+      gachaId: 2088,
+      gachaType: "AvatarUp",
+      beginTime: 1758664800, // 2025-09-24 06:00:00 (版本更新)
+      endTime: 1760500740,   // 2025-10-15 11:59:00
+      rateUpItems5: [
+        1413, // 长夜月
+      ],
+      rateUpItems4: [
+        1312, // 米沙
+        1210, // 桂乃芬
+        1214  // 雪衣
+      ]
+    },
+
+    // 长夜月专武
+    {
+      gachaId: 3088,
+      gachaType: "WeaponUp",
+      beginTime: 1758664800,
+      endTime: 1760500740,
+      rateUpItems5: [
+        23049, // 致长夜的星光
+      ],
+      rateUpItems4: [
+        21048, // 梦的蒙太奇
+        21045, // 谐乐静默之后
+        21018  // 舞！舞！舞！
+      ]
+    },
+
+    // 大黑塔（新/SP）
+    {
+      gachaId: 2089,
+      gachaType: "AvatarUp",
+      beginTime: 1758664800,
+      endTime: 1760500740,
+      rateUpItems5: [
+        1401, // 大黑塔
+      ],
+      rateUpItems4: [
+        1312, // 米沙
+        1210, // 桂乃芬
+        1214  // 雪衣
+      ]
+    },
+
+    // 大黑塔专武
+    {
+      gachaId: 3089,
+      gachaType: "WeaponUp",
+      beginTime: 1758664800,
+      endTime: 1760500740,
+      rateUpItems5: [
+        23037, // 向着不可追问处
+      ],
+      rateUpItems4: [
+        21048, // 梦的蒙太奇
+        21045, // 谐乐静默之后
+        21018  // 舞！舞！舞！
+      ]
+    },
+
+    // ============================
+    // 【3.6 下半】丹恒·腾荒 / 那刻夏
+    // ============================
+
+    // 丹恒·腾荒（新/SP）
+    {
+      gachaId: 2090,
+      gachaType: "AvatarUp",
+      beginTime: 1760500800, // 2025-10-15 12:00:00
+      endTime: 1762239600,   // 2025-11-04 15:00:00
+      rateUpItems5: [
+        1414, // 丹恒•腾荒
+      ],
+      rateUpItems4: [
+        1206, // 素裳
+        1215, // 寒鸦
+        1103  // 希露瓦
+      ]
+    },
+
+    // 丹恒·腾荒专武
+    {
+      gachaId: 3090,
+      gachaType: "WeaponUp",
+      beginTime: 1760500800,
+      endTime: 1762239600,
+      rateUpItems5: [
+        23051, // 纵然山河万程
+      ],
+      rateUpItems4: [
+        21009, // 朗道的选择
+        21003, // 唯有沉默
+        21014  // 此时恰好
+      ]
+    },
+
+    // 那刻夏（复刻）
+    {
+      gachaId: 2091,
+      gachaType: "AvatarUp",
+      beginTime: 1760500800, // 2025-10-15 12:00:00
+      endTime: 1762239600,   // 2025-11-04 15:00:00
+      rateUpItems5: [
+        1405, // 那刻夏
+      ],
+      rateUpItems4: [
+        1206, // 素裳
+        1215, // 寒鸦
+        1103  // 希露瓦
+      ]
+    },
+
+    // 那刻夏专武
+    {
+      gachaId: 3091,
+      gachaType: "WeaponUp",
+      beginTime: 1760500800,
+      endTime: 1762239600,
+      rateUpItems5: [
+        23041, // 生命当付之一炬
+      ],
+      rateUpItems4: [
+        21009, // 朗道的选择
+        21003, // 唯有沉默
+        21014  // 此时恰好
+      ]
+    },
+	 {
       "gachaId": 5001,
       "gachaType": "AvatarUp",
       "beginTime": 1752206400,
       "endTime": 4082544000,
       "rateUpItems5": [
-        1014
+        1014 //Saber
       ],
       "rateUpItems4": [
       ]
@@ -97,7 +2486,7 @@
       "beginTime": 1752206400,
       "endTime": 4082544000,
       "rateUpItems5": [
-        1015
+        1015 //Archer
       ],
       "rateUpItems4": [
       ]
@@ -133,7 +2522,91 @@
       "beginTime": 1762295400,
       "endTime": 1765868400,
       "rateUpItems5": [
-        1415
+        1415 //昔涟
+      ],
+      "rateUpItems4": [
+        1223,
+        1110,
+        1106
+      ]
+    },
+    {
+      "gachaId": 3093,
+      "gachaType": "WeaponUp",
+      "beginTime": 1762295400,
+      "endTime": 1764129540,
+      "rateUpItems5": [
+        23042
+      ],
+      "rateUpItems4": [
+        21054,
+        21044,
+        21043
+      ]
+    },
+	 {
+      "gachaId": 2093,
+      "gachaType": "AvatarUp",
+      "beginTime": 1762295400,
+      "endTime": 1764129540,
+      "rateUpItems5": [
+        1407//遐蝶
+      ],
+      "rateUpItems4": [
+        1223,
+        1110,
+        1106
+      ]
+    },
+	 {
+      "gachaId": 3094,
+      "gachaType": "WeaponUp",
+      "beginTime": 1762295400,
+      "endTime": 1764129540,
+      "rateUpItems5": [
+        23038
+      ],
+      "rateUpItems4": [
+        21054,
+        21044,
+        21043
+      ]
+    },
+	 {
+      "gachaId": 2094,
+      "gachaType": "AvatarUp",
+      "beginTime": 1762295400,
+      "endTime": 1764129540,
+      "rateUpItems5": [
+        1409//风堇
+      ],
+      "rateUpItems4": [
+        1223,
+        1110,
+        1106
+      ]
+    },
+	 {
+      "gachaId": 3095,
+      "gachaType": "WeaponUp",
+      "beginTime": 1762295400,
+      "endTime": 1764129540,
+      "rateUpItems5": [
+        23040
+      ],
+      "rateUpItems4": [
+        21054,
+        21044,
+        21043
+      ]
+    },
+	 {
+      "gachaId": 2095,
+      "gachaType": "AvatarUp",
+      "beginTime": 1762295400,
+      "endTime": 1764129540,
+      "rateUpItems5": [
+        1403//缇宝
       ],
       "rateUpItems4": [
         1223,
@@ -147,7 +2620,7 @@
       "beginTime": 1764129600,
       "endTime": 1765868400,
       "rateUpItems5": [
-        23039
+        23043
       ],
       "rateUpItems4": [
         21054,
@@ -161,7 +2634,7 @@
       "beginTime": 1764129600,
       "endTime": 1765868400,
       "rateUpItems5": [
-        1404
+        1404//万敌
       ],
       "rateUpItems4": [
         1223,
@@ -189,7 +2662,7 @@
       "beginTime": 1764129600,
       "endTime": 1765868400,
       "rateUpItems5": [
-        1406
+        1406//赛飞儿
       ],
       "rateUpItems4": [
         1223,
@@ -217,7 +2690,7 @@
       "beginTime": 1764129600,
       "endTime": 1765868400,
       "rateUpItems5": [
-        1408
+        1408//白厄
       ],
       "rateUpItems4": [
         1223,
@@ -225,5 +2698,6 @@
         1106
       ]
     }
+  
   ]
 }

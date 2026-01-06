@@ -1,2 +1,1 @@
-dotnet build -c Release
-沉浸器2 星琼100 沉浸器2 星轨通票1 信用点125000 星琼95 遗失晶块14 黑塔债卷1 信用点125000 命运的足迹1
+git fetch --all && git reset --hard origin/main

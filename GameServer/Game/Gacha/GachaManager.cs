@@ -195,8 +195,18 @@ public class GachaManager : BasePlayerManager
             // 发放抽到的物品
             if (GameData.ItemConfigData[item].ItemMainType == ItemMainTypeEnum.AvatarCard &&
                 Player.AvatarManager!.GetFormalAvatar(item) == null)
-            {
+            {   // 1. 发放角色本身
                 await Player.AvatarManager!.AddAvatar(item, isGacha: true);
+				// 2. 发放对应的头像 (规律: 200000 + 角色ID)
+                int headIconId = 200000 + item;
+    
+               // 检查该头像是否存在（可以根据配置校验，或者直接尝试添加）
+               // 假设头像在 InventoryManager 中作为一种 Item 处理
+               var headIconItem = await Player.InventoryManager!.AddItem(headIconId, 1, false, sync: false, returnRaw: true);
+               if (headIconItem != null)
+               {
+               syncItems.Add(headIconItem);
+               }
             }
             else
             {
