@@ -51,7 +51,15 @@ public static class UtilTools
 
         return false;
     }
-
+    // 文件路径: Common/Util/UtilTools.cs 内部
+    public static bool IsSameDaily(long lastTime, long nowTime)
+   {
+    // 游戏通常以凌晨 4 点作为跨天线 (14400秒)
+    // DateTimeOffset 处理本地时区转换，Date 比较日期
+    var lastDate = DateTimeOffset.FromUnixTimeSeconds(lastTime - 14400).ToLocalTime().Date;
+    var nowDate = DateTimeOffset.FromUnixTimeSeconds(nowTime - 14400).ToLocalTime().Date;
+    return lastDate == nowDate;
+   }
     public static bool CompareNumberByOperationEnum(int left, int right, CompareTypeEnum operation)
     {
         return operation switch

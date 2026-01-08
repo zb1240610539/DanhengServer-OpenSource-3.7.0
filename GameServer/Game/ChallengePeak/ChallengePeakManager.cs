@@ -20,101 +20,123 @@ public class ChallengePeakManager(PlayerInstance player) : BasePlayerManager(pla
 {
     public bool BossIsHard { get; set; } = true;
 
-    public ChallengePeakLevelInfo GetChallengePeakInfo(int groupId)
+  public ChallengePeakLevelInfo GetChallengePeakInfo(int groupId)
+{
+    var proto = new ChallengePeakLevelInfo
     {
-        var proto = new ChallengePeakLevelInfo
+        PeakGroupId = (uint)groupId
+    };
+
+    // 1. 获取当前期的配置组数据
+    var data = GameData.ChallengePeakGroupConfigData.GetValueOrDefault(groupId);
+    if (data == null) return proto;
+
+    var starNum = 0;
+    // 关键变量：标记前一个关卡是否已通关，初始为 true 确保第一关显示
+    bool isPrevFinished = true; 
+
+    // 2. 处理普通关卡 (PreLevel)
+    foreach (var levelId in data.PreLevelIDList)
+    {
+        var levelData = GameData.ChallengePeakConfigData.GetValueOrDefault(levelId);
+        if (levelData == null) continue;
+
+        // --- 自动化解锁逻辑 ---
+        // 如果前一关没打通，后续所有关卡都不下发给客户端
+        if (!isPrevFinished) continue; 
+
+        var levelProto = new ChallengePeakPreLevel
         {
-            PeakGroupId = (uint)groupId
+            PeakLevelId = (uint)levelId,
+            IsFinished = false // 默认设为未完成
         };
 
-        var data = GameData.ChallengePeakGroupConfigData.GetValueOrDefault(groupId);
-        if (data == null) return proto;
-
-        var starNum = 0;
-        foreach (var levelId in data.PreLevelIDList)
+        // 检查数据库中是否存在该关卡的通关记录
+        if (Player.ChallengeManager!.ChallengeData.PeakLevelDatas.TryGetValue(levelId, out var levelPbData))
         {
-            var levelData = GameData.ChallengePeakConfigData.GetValueOrDefault(levelId);
-            if (levelData == null) continue;
+            // 玩家已通关该关卡
+            levelProto.IsFinished = true;
+            isPrevFinished = true; // 允许循环继续处理下一关
 
-            var levelProto = new ChallengePeakPreLevel
+            starNum += (int)levelPbData.PeakStar;
+            levelProto.PeakRoundsCount = levelPbData.RoundCnt;
+            levelProto.PeakLevelAvatarIdList.AddRange(levelPbData.BaseAvatarList);
+            levelProto.PeakTargetList.AddRange(levelPbData.FinishedTargetList);
+
+            // 填充角色信息供客户端展示
+            foreach (var avatarId in levelPbData.BaseAvatarList)
             {
-                PeakLevelId = (uint)levelId,
-                IsFinished = true
-            };
-
-            if (Player.ChallengeManager!.ChallengeData.PeakLevelDatas.TryGetValue(levelId, out var levelPbData))
-            {
-                starNum += (int)levelPbData.PeakStar;
-
-                levelProto.PeakRoundsCount = levelPbData.RoundCnt;
-                levelProto.PeakLevelAvatarIdList.AddRange(levelPbData.BaseAvatarList);
-                levelProto.PeakTargetList.AddRange(levelPbData.FinishedTargetList);
-
-                foreach (var avatarId in levelPbData.BaseAvatarList)
-                {
-                    var avatar = Player.AvatarManager!.GetFormalAvatar((int)avatarId);
-                    if (avatar == null) continue;
-
-                    levelProto.PeakAvatarInfoList.Add(avatar.ToPeakAvatarProto());
-                }
-
-                proto.FinishedPreNum++;
+                var avatar = Player.AvatarManager!.GetFormalAvatar((int)avatarId);
+                if (avatar == null) continue;
+                levelProto.PeakAvatarInfoList.Add(avatar.ToPeakAvatarProto());
             }
 
-            proto.PeakPreLevelInfoList.Add(levelProto);
+            proto.FinishedPreNum++;
+        }
+        else
+        {
+            // 玩家未通关该关卡，标记后，循环中的后续关卡将被跳过
+            levelProto.IsFinished = false;
+            isPrevFinished = false; 
         }
 
-        proto.PreLevelStars = (uint)starNum;
-
-        // boss
-        var bossLevelId = data.BossLevelID;
-        if (bossLevelId <= 0) return proto;
-
-        var bossLevelData = GameData.ChallengePeakBossConfigData.GetValueOrDefault(bossLevelId);
-        if (bossLevelData == null) return proto;
-
-        var bossProto = new ChallengePeakBossLevel
-        {
-            PeakBossLevelId = (uint)bossLevelId,
-            IsUltraBossWin = true,
-            PeakEasyBoss = new ChallengePeakBossInfo(),
-            PeakHardBoss = new ChallengePeakBossInfo()
-        };
-
-        HashSet<uint> targetIds = [];
-        if (Player.ChallengeManager!.ChallengeData.PeakBossLevelDatas.TryGetValue((bossLevelId << 2) | 0,
-                out var bossPbData)) // easy (is hard = 0)
-        {
-            bossProto.PeakEasyBoss.PeakLevelAvatarIdList.AddRange(bossPbData.BaseAvatarList);
-            bossProto.PeakEasyBoss.BossDisplayAvatarIdList.AddRange(bossPbData.BaseAvatarList);
-
-            bossProto.PeakEasyBoss.LeastRoundsCount = bossPbData.RoundCnt;
-            bossProto.PeakEasyBoss.IsFinished = true;
-            bossProto.PeakEasyBoss.BuffId = bossPbData.BuffId;
-
-            foreach (var targetId in bossPbData.FinishedTargetList) targetIds.Add(targetId);
-        }
-
-        if (Player.ChallengeManager!.ChallengeData.PeakBossLevelDatas.TryGetValue((bossLevelId << 2) | 1,
-                out var bossHardPbData)) // easy (is hard = 1)
-        {
-            bossProto.IsUltraBossWin = true;
-            bossProto.PeakHardBoss.PeakLevelAvatarIdList.AddRange(bossHardPbData.BaseAvatarList);
-            bossProto.PeakHardBoss.BossDisplayAvatarIdList.AddRange(bossHardPbData.BaseAvatarList);
-
-            bossProto.PeakHardBoss.LeastRoundsCount = bossHardPbData.RoundCnt;
-            bossProto.PeakHardBoss.IsFinished = true;
-            bossProto.PeakHardBoss.BuffId = bossHardPbData.BuffId;
-
-            foreach (var targetId in bossHardPbData.FinishedTargetList) targetIds.Add(targetId);
-        }
-
-        bossProto.PeakTargetList.AddRange(targetIds);
-
-        proto.PeakBossLevel = bossProto;
-
-        return proto;
+        proto.PeakPreLevelInfoList.Add(levelProto);
     }
+
+    proto.PreLevelStars = (uint)starNum;
+
+    // --- 3. Boss 关卡解锁逻辑 ---
+    // 只有当前置关卡（PreLevel）全部打通后，才继续处理并下发 Boss 关卡数据
+    if (proto.FinishedPreNum < data.PreLevelIDList.Count) 
+    {
+        return proto; 
+    }
+
+    var bossLevelId = data.BossLevelID;
+    if (bossLevelId <= 0) return proto;
+
+    var bossLevelData = GameData.ChallengePeakBossConfigData.GetValueOrDefault(bossLevelId);
+    if (bossLevelData == null) return proto;
+
+    // 构建 Boss 关卡协议数据
+    var bossProto = new ChallengePeakBossLevel
+    {
+        PeakBossLevelId = (uint)bossLevelId,
+        IsUltraBossWin = false, // 默认未赢得终极挑战
+        PeakEasyBoss = new ChallengePeakBossInfo(),
+        PeakHardBoss = new ChallengePeakBossInfo()
+    };
+
+    HashSet<uint> targetIds = [];
+    
+    // 读取简单难度 Boss 记录 (is hard = 0)
+    if (Player.ChallengeManager!.ChallengeData.PeakBossLevelDatas.TryGetValue((bossLevelId << 2) | 0, out var bossPbData))
+    {
+        bossProto.PeakEasyBoss.PeakLevelAvatarIdList.AddRange(bossPbData.BaseAvatarList);
+        bossProto.PeakEasyBoss.BossDisplayAvatarIdList.AddRange(bossPbData.BaseAvatarList);
+        bossProto.PeakEasyBoss.LeastRoundsCount = bossPbData.RoundCnt;
+        bossProto.PeakEasyBoss.IsFinished = true;
+        bossProto.PeakEasyBoss.BuffId = bossPbData.BuffId;
+        foreach (var targetId in bossPbData.FinishedTargetList) targetIds.Add(targetId);
+    }
+
+    // 读取困难难度 Boss 记录 (is hard = 1)
+    if (Player.ChallengeManager!.ChallengeData.PeakBossLevelDatas.TryGetValue((bossLevelId << 2) | 1, out var bossHardPbData))
+    {
+        bossProto.IsUltraBossWin = true;
+        bossProto.PeakHardBoss.PeakLevelAvatarIdList.AddRange(bossHardPbData.BaseAvatarList);
+        bossProto.PeakHardBoss.BossDisplayAvatarIdList.AddRange(bossHardPbData.BaseAvatarList);
+        bossProto.PeakHardBoss.LeastRoundsCount = bossHardPbData.RoundCnt;
+        bossProto.PeakHardBoss.IsFinished = true;
+        bossProto.PeakHardBoss.BuffId = bossHardPbData.BuffId;
+        foreach (var targetId in bossHardPbData.FinishedTargetList) targetIds.Add(targetId);
+    }
+
+    bossProto.PeakTargetList.AddRange(targetIds);
+    proto.PeakBossLevel = bossProto;
+
+    return proto;
+}
 
     public async ValueTask SetLineupAvatars(int groupId, List<ChallengePeakLineup> lineups)
     {

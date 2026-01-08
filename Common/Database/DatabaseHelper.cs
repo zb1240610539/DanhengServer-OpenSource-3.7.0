@@ -24,7 +24,12 @@ public class DatabaseHelper
     {
         Instance = this;
     }
-
+    public static void UpdateInstance<T>(T instance) where T : class, new()
+{
+    // 使用 Storageable 可以自动判断是插入还是更新（需要主键支持）
+    // 或者简单使用 Updateable
+    sqlSugarScope?.Updateable(instance).ExecuteCommand();
+}
     public void Initialize()
     {
         logger.Info(I18NManager.Translate("Server.ServerInfo.LoadingItem", I18NManager.Translate("Word.Database")));

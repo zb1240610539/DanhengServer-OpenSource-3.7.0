@@ -149,8 +149,7 @@ public class FriendManager(PlayerInstance player) : BasePlayerManager(player)
 
         await Player.SendPacket(proto);
 
-        if (recvUid == ConfigManager.Config.ServerOption.ServerProfile.Uid)
-          // 判定：消息不为空，且以 "GM#" 开头
+       // 判定：消息不为空，且以 "GM#" 开头
             if (message != null && message.StartsWith("GM#"))
             {
           // 截取 "GM#" 之后的所有内容作为指令
@@ -357,7 +356,123 @@ public class FriendManager(PlayerInstance player) : BasePlayerManager(player)
         if (!FriendData.FriendDetailList.TryGetValue(uid, out var friend)) return;
         friend.IsMark = isMark;
     }
+ public GetFriendRecommendLineupScRsp GetGlobalRecommendLineup(uint challengeId)
+    {
+        var rsp = new GetFriendRecommendLineupScRsp
+        {
+            Key = challengeId,
+            Retcode = 0,
+            Type = (DLLLEANDAIH)2 
+        };
 
+        var allRecords = DatabaseHelper.sqlSugarScope?.Queryable<FriendRecordData>().ToList() ?? new();
+
+        foreach (var record in allRecords)
+        {
+            // 默认不显示当前登录玩家自己的战报
+            if (record.Uid == (uint)Player.Uid) continue;
+
+            var pData = PlayerData.GetPlayerByUid(record.Uid);
+            if (pData == null) continue;
+
+            var entry = new KEHMGKIHEFN 
+            {
+                PlayerInfo = pData.ToSimpleProto(FriendOnlineStatus.Offline),
+                RemarkName = "" 
+            };
+
+            bool hasData = false;
+            foreach (var groupStat in record.ChallengeGroupStatistics.Values)
+            {
+                // A. 忘却之庭 (PMHIBHNEPHI - Tag 1)
+                if (groupStat.MemoryGroupStatistics != null && 
+                    groupStat.MemoryGroupStatistics.TryGetValue(challengeId, out var mStats))
+                {
+                    entry.PMHIBHNEPHI = BuildMemoryContainer(mStats, challengeId);
+                    hasData = true;
+                    break; 
+                }
+
+                // B. 虚构叙事 (JILKKAJBLJK - Tag 2)
+                if (!hasData && groupStat.StoryGroupStatistics != null && 
+                    groupStat.StoryGroupStatistics.TryGetValue(challengeId, out var sStats))
+                {
+                    entry.JILKKAJBLJK = BuildStoryContainer(sStats);
+                    hasData = true;
+                    break;
+                }
+
+                // C. 末日幻影 (ADDCJEJPFEF - Tag 3)
+                if (!hasData && groupStat.BossGroupStatistics != null && 
+                    groupStat.BossGroupStatistics.TryGetValue(challengeId, out var bStats))
+                {
+                    entry.ADDCJEJPFEF = BuildBossContainer(bStats);
+                    hasData = true;
+                    break;
+                }
+            }
+
+            if (hasData) rsp.ChallengeRecommendList.Add(entry);
+        }
+
+        return rsp;
+    }
+
+    private DKHENLMAEBE BuildMemoryContainer(MemoryGroupStatisticsPb stats, uint cid)
+    {
+        var container = new DKHENLMAEBE();
+        foreach (var team in stats.Lineups)
+        {
+            var teamProto = new GIIHBKMJKHM { PeakLevelId = cid };
+            foreach (var a in team)
+            {
+                teamProto.AvatarList.Add(new OILPIACENNH 
+                { 
+                    Id = (uint)a.Id, 
+                    Level = (uint)a.Level, 
+                    Index = (uint)a.Index,
+                    AvatarType = (global::EggLink.DanhengServer.Proto.AvatarType)a.AvatarType 
+                });
+            }
+            for (uint i = 1; i <= Math.Min((uint)stats.Stars, 3); i++) teamProto.PeakTargetList.Add(i);
+            container.HFPPEGIFFLM.Add(teamProto);
+        }
+        return container;
+    }
+
+    private IIGJFPMIGKF BuildStoryContainer(StoryGroupStatisticsPb stats)
+    {
+        var container = new IIGJFPMIGKF { BuffId = (uint)stats.BuffOne, IsHard = stats.Stars >= 3 };
+        foreach (var team in stats.Lineups)
+        {
+            foreach (var a in team)
+            {
+                container.AvatarList.Add(new OILPIACENNH 
+                { 
+                    Id = (uint)a.Id, Level = (uint)a.Level, Index = (uint)a.Index,
+                    AvatarType = (global::EggLink.DanhengServer.Proto.AvatarType)a.AvatarType 
+                });
+            }
+        }
+        return container;
+    }
+
+    private KAMCIOPBPGA BuildBossContainer(BossGroupStatisticsPb stats)
+    {
+        var container = new KAMCIOPBPGA();
+        foreach (var team in stats.Lineups)
+        {
+            foreach (var a in team)
+            {
+                container.AvatarList.Add(new OILPIACENNH 
+                { 
+                    Id = (uint)a.Id, Level = (uint)a.Level, Index = (uint)a.Index,
+                    AvatarType = (global::EggLink.DanhengServer.Proto.AvatarType)a.AvatarType 
+                });
+            }
+        }
+        return container;
+    }
     public GetFriendListInfoScRsp ToProto()
     {
         var proto = new GetFriendListInfoScRsp();
