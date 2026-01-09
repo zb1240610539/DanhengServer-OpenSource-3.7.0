@@ -1,5 +1,6 @@
 ﻿using EggLink.DanhengServer.Database;
 using EggLink.DanhengServer.Database.Friend;
+using EggLink.DanhengServer.Data; // 必须有这一行，才能找到 GameData
 using EggLink.DanhengServer.Database.Player;
 using EggLink.DanhengServer.GameServer.Command;
 using EggLink.DanhengServer.GameServer.Game.Player;
@@ -356,123 +357,117 @@ public class FriendManager(PlayerInstance player) : BasePlayerManager(player)
         if (!FriendData.FriendDetailList.TryGetValue(uid, out var friend)) return;
         friend.IsMark = isMark;
     }
- public GetFriendRecommendLineupScRsp GetGlobalRecommendLineup(uint challengeId)
+ // 建议修改函数签名，传入客户端请求的 Type
+public GetFriendRecommendLineupScRsp GetGlobalRecommendLineup(uint challengeId, uint requestType) 
+{
+    var Log = Logger.GetByClassName();
+    Log.Info($"[LOG-DEBUG] === 战报请求开始 ===");
+    Log.Info($"[LOG-DEBUG] 请求关卡: {challengeId} | 类型: {requestType} | UID: {Player.Uid}");
+
+    var rsp = new GetFriendRecommendLineupScRsp
     {
-        var rsp = new GetFriendRecommendLineupScRsp
-        {
-            Key = challengeId,
-            Retcode = 0,
-            Type = (DLLLEANDAIH)2 
-        };
+        Key = challengeId,
+        Retcode = 0,
+        Type = (DLLLEANDAIH)requestType, 
+        ONOCJEEBFCI = false    
+    };
 
-        var allRecords = DatabaseHelper.sqlSugarScope?.Queryable<FriendRecordData>().ToList() ?? new();
-
-        foreach (var record in allRecords)
-        {
-            // 默认不显示当前登录玩家自己的战报
-            if (record.Uid == (uint)Player.Uid) continue;
-
-            var pData = PlayerData.GetPlayerByUid(record.Uid);
-            if (pData == null) continue;
-
-            var entry = new KEHMGKIHEFN 
-            {
-                PlayerInfo = pData.ToSimpleProto(FriendOnlineStatus.Offline),
-                RemarkName = "" 
-            };
-
-            bool hasData = false;
-            foreach (var groupStat in record.ChallengeGroupStatistics.Values)
-            {
-                // A. 忘却之庭 (PMHIBHNEPHI - Tag 1)
-                if (groupStat.MemoryGroupStatistics != null && 
-                    groupStat.MemoryGroupStatistics.TryGetValue(challengeId, out var mStats))
-                {
-                    entry.PMHIBHNEPHI = BuildMemoryContainer(mStats, challengeId);
-                    hasData = true;
-                    break; 
-                }
-
-                // B. 虚构叙事 (JILKKAJBLJK - Tag 2)
-                if (!hasData && groupStat.StoryGroupStatistics != null && 
-                    groupStat.StoryGroupStatistics.TryGetValue(challengeId, out var sStats))
-                {
-                    entry.JILKKAJBLJK = BuildStoryContainer(sStats);
-                    hasData = true;
-                    break;
-                }
-
-                // C. 末日幻影 (ADDCJEJPFEF - Tag 3)
-                if (!hasData && groupStat.BossGroupStatistics != null && 
-                    groupStat.BossGroupStatistics.TryGetValue(challengeId, out var bStats))
-                {
-                    entry.ADDCJEJPFEF = BuildBossContainer(bStats);
-                    hasData = true;
-                    break;
-                }
-            }
-
-            if (hasData) rsp.ChallengeRecommendList.Add(entry);
-        }
-
+    if (!GameData.ChallengeConfigData.TryGetValue((int)challengeId, out var config))
+    {
+        Log.Error($"[LOG-DEBUG] 找不到配置 ID: {challengeId}");
         return rsp;
     }
 
-    private DKHENLMAEBE BuildMemoryContainer(MemoryGroupStatisticsPb stats, uint cid)
+    var allRecords = DatabaseHelper.sqlSugarScope?.Queryable<FriendRecordData>().ToList() ?? new();
+
+    foreach (var record in allRecords)
     {
-        var container = new DKHENLMAEBE();
-        foreach (var team in stats.Lineups)
+        var pData = PlayerData.GetPlayerByUid(record.Uid);
+        if (pData == null) continue;
+
+        bool isSelf = (record.Uid == Player.Uid);
+
+        if (!record.ChallengeGroupStatistics.TryGetValue((uint)config.GroupID, out var groupStat)) continue;
+
+        if (groupStat.MemoryGroupStatistics == null || 
+            !groupStat.MemoryGroupStatistics.TryGetValue(challengeId, out var memoryStats)) continue;
+
+        var entry = new KEHMGKIHEFN();
+        entry.PlayerInfo = pData.ToSimpleProto(isSelf ? FriendOnlineStatus.Online : FriendOnlineStatus.Offline);
+
+        if (isSelf)
         {
-            var teamProto = new GIIHBKMJKHM { PeakLevelId = cid };
-            foreach (var a in team)
+            Log.Info($"[LOG-DEBUG] [自己] 匹配成功，开始填充战报容器...");
+            rsp.ONOCJEEBFCI = true; 
+            
+            // 修正处：根据你提供的源码，这里没有 Id 字段
+            entry.GIEIDJEEPAC = new FCNOLLFGPCK
             {
-                teamProto.AvatarList.Add(new OILPIACENNH 
-                { 
-                    Id = (uint)a.Id, 
-                    Level = (uint)a.Level, 
-                    Index = (uint)a.Index,
-                    AvatarType = (global::EggLink.DanhengServer.Proto.AvatarType)a.AvatarType 
-                });
+                PlayerInfo = entry.PlayerInfo,
+                CurLevelStars = memoryStats.Stars,
+                ScoreId = memoryStats.RoundCount, 
+                BuffOne = (uint)config.MazeBuffID,
+                BuffTwo = (uint)config.MazeBuffID,
+                RemarkName = "" // 源码中有此字段，设为空即可
+            };
+
+            // 填充详细阵容 (必须要转换模型)
+            foreach (var dbTeam in memoryStats.Lineups)
+            {
+                var teamProto = new ChallengeLineupList();
+                foreach (var av in dbTeam)
+                {
+                    teamProto.AvatarList.Add(new ChallengeAvatarInfo
+                    {
+                        Id = av.Id,
+                        Level = av.Level,
+                        Index = av.Index,
+                        AvatarType = AvatarType.AvatarFormalType, 
+                        GGDIIBCDOBB = av.Rank 
+                    });
+                }
+                entry.GIEIDJEEPAC.LineupList.Add(teamProto);
             }
-            for (uint i = 1; i <= Math.Min((uint)stats.Stars, 3); i++) teamProto.PeakTargetList.Add(i);
-            container.HFPPEGIFFLM.Add(teamProto);
         }
-        return container;
+        else
+        {
+            entry.PMHIBHNEPHI = BuildMemoryContainer(memoryStats, challengeId);
+            entry.ADDCJEJPFEF = new KAMCIOPBPGA
+            {
+                PeakTargetList = { memoryStats.Stars, memoryStats.RoundCount }
+            };
+        }
+
+        rsp.ChallengeRecommendList.Add(entry);
     }
 
-    private IIGJFPMIGKF BuildStoryContainer(StoryGroupStatisticsPb stats)
+    Log.Info($"[LOG-DEBUG] === 处理完毕 === ONOCJEEBFCI: {rsp.ONOCJEEBFCI}");
+    return rsp;
+}
+  private DKHENLMAEBE BuildMemoryContainer(MemoryGroupStatisticsPb stats, uint cid)
+{
+    var container = new DKHENLMAEBE();
+    
+    // stats.Lineups 是 List<List<ChallengeAvatarInfoPb>>
+    foreach (var team in stats.Lineups)
     {
-        var container = new IIGJFPMIGKF { BuffId = (uint)stats.BuffOne, IsHard = stats.Stars >= 3 };
-        foreach (var team in stats.Lineups)
+        var sideProto = new GIIHBKMJKHM { PeakLevelId = cid };
+        
+        foreach (var avPb in team)
         {
-            foreach (var a in team)
+            sideProto.AvatarList.Add(new OILPIACENNH
             {
-                container.AvatarList.Add(new OILPIACENNH 
-                { 
-                    Id = (uint)a.Id, Level = (uint)a.Level, Index = (uint)a.Index,
-                    AvatarType = (global::EggLink.DanhengServer.Proto.AvatarType)a.AvatarType 
-                });
-            }
+                AvatarType = avPb.AvatarType,
+                Id = avPb.Id,
+                Level = avPb.Level,
+                Index = avPb.Index,
+                GGDIIBCDOBB = avPb.Rank // 刚才已经在 FriendRecordData 里补全了 Rank 属性
+            });
         }
-        return container;
+        container.HFPPEGIFFLM.Add(sideProto);
     }
-
-    private KAMCIOPBPGA BuildBossContainer(BossGroupStatisticsPb stats)
-    {
-        var container = new KAMCIOPBPGA();
-        foreach (var team in stats.Lineups)
-        {
-            foreach (var a in team)
-            {
-                container.AvatarList.Add(new OILPIACENNH 
-                { 
-                    Id = (uint)a.Id, Level = (uint)a.Level, Index = (uint)a.Index,
-                    AvatarType = (global::EggLink.DanhengServer.Proto.AvatarType)a.AvatarType 
-                });
-            }
-        }
-        return container;
-    }
+    return container;
+}
     public GetFriendListInfoScRsp ToProto()
     {
         var proto = new GetFriendListInfoScRsp();
