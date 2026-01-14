@@ -7,12 +7,15 @@ namespace EggLink.DanhengServer.GameServer.Game.Rogue.Scene;
 
 public class RogueRoomInstance
 {
+    // --- 补全：新增属性用于保存同步等级 ---
+    public int MonsterLevel { get; set; } 
+
     /// <summary>
-    /// 初始化模拟宇宙房间 
+    /// 初始化模拟宇宙房间
     /// </summary>
     /// <param name="excel">来自 RogueMap.json 的点位信息</param>
-    /// <param name="areaId">来自 RogueAreaConfig.json 的世界 ID (如 130, 180, 190)</param>
-    public RogueRoomInstance(RogueMapExcel excel, int areaId)
+    /// <param name="areaConfig">传入完整的区域配置以获取难度和进度</param>
+    public RogueRoomInstance(RogueMapExcel excel, RogueAreaConfigExcel areaConfig)
     {
         SiteId = excel.SiteID;
         NextSiteIds = excel.NextSiteIDList;
@@ -20,7 +23,12 @@ public class RogueRoomInstance
         // 初始状态：起点设为解锁，其余锁定
         Status = excel.IsStart ? RogueRoomStatus.Unlock : RogueRoomStatus.Lock;
 
-        // --- 核心逻辑：区分普通房与BOSS 房 ---
+        // --- 补全：获取核心维度（进度和难度） ---
+        int areaId = areaConfig.RogueAreaID;
+        int progress = areaConfig.AreaProgress;
+        int difficulty = areaConfig.Difficulty;
+
+        // --- 核心逻辑：区分普通房与 BOSS 房 ---
         
         // SiteID 13 是通用的关底点位，111/112 是分歧 BOSS 点位
         if (SiteId == 13 || SiteId == 111 || SiteId == 112)
@@ -41,6 +49,11 @@ public class RogueRoomInstance
             }
         }
 
+        // --- 补全：核心等级同步逻辑 ---
+        // 这里计算的等级将直接应用到大地图上怪物的显示
+        // 公式：世界基准(progress*10) + 难度增幅((difficulty-1)*10) + 5层基础修正
+        this.MonsterLevel = progress * 10 + (difficulty - 1) * 10 + 5;
+
         // 加载具体的房间配置数据
         if (GameData.RogueRoomData.TryGetValue(RoomId, out var roomExcel))
         {
@@ -48,7 +61,7 @@ public class RogueRoomInstance
         }
         else
         {
-            // 最终兜底：若 RoomId 在 RogueRoom.json 不存在，指向一个基础战斗房
+            // 最终兜底：若 RoomId 不存在，指向一个基础战斗房
             Excel = GameData.RogueRoomData.Values.First(x => x.RogueRoomType == 1);
             RoomId = Excel.RogueRoomID;
         }
@@ -65,7 +78,6 @@ public class RogueRoomInstance
     /// </summary>
     private int GetBossRoomIdByArea(int areaId)
     {
-        // 提取世界进度 (例如 130 -> 3, 180 -> 8)
         int progress = areaId / 10;
 
         return progress switch
@@ -77,7 +89,6 @@ public class RogueRoomInstance
             5 => 131713,   // 世界 5 (卡芙卡)
             6 => 122713,   // 世界 6 (可可利亚)
             7 => 132713,   // 世界 7 (丰饶玄鹿)
-            // 如果你没有 8 和 9 的专属 ID，通常官方是复用 6 和 7 的场景但替换怪物
             8 => 122713,   // 世界 8 复用场景配置
             9 => 132713,   // 世界 9 复用场景配置
             _ => 111713    // 默认
