@@ -8,7 +8,7 @@ namespace EggLink.DanhengServer.GameServer.Game.Rogue.Scene;
 public class RogueRoomInstance
 {
     /// <summary>
-    /// 初始化模拟宇宙房间
+    /// 初始化模拟宇宙房间 
     /// </summary>
     /// <param name="excel">来自 RogueMap.json 的点位信息</param>
     /// <param name="areaId">来自 RogueAreaConfig.json 的世界 ID (如 130, 180, 190)</param>
@@ -20,7 +20,7 @@ public class RogueRoomInstance
         // 初始状态：起点设为解锁，其余锁定
         Status = excel.IsStart ? RogueRoomStatus.Unlock : RogueRoomStatus.Lock;
 
-        // --- 核心逻辑：区分普通房与 BOSS 房 ---
+        // --- 核心逻辑：区分普通房与BOSS 房 ---
         
         // SiteID 13 是通用的关底点位，111/112 是分歧 BOSS 点位
         if (SiteId == 13 || SiteId == 111 || SiteId == 112)
