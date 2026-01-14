@@ -2,9 +2,10 @@ name: DanhengServer Windows Build
 
 on:
   push:
-    branches: [ "3.7.0" ] # 对应你当前的 3.7.0 分支
+    branches: [ "main" ] # 修改这里，匹配你的 main 分支
   pull_request:
-    branches: [ "3.7.0" ]
+    branches: [ "main" ]
+  workflow_dispatch: # 强烈建议加上这一行，允许你手动点击按钮运行
 
 jobs:
   build:
