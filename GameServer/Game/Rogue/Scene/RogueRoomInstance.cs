@@ -1,4 +1,4 @@
-﻿using EggLink.DanhengServer.Data;
+using EggLink.DanhengServer.Data;
 using EggLink.DanhengServer.Data.Excel;
 using EggLink.DanhengServer.Proto;
 using EggLink.DanhengServer.Util;
