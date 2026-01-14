@@ -201,38 +201,50 @@ public class RogueInstance : BaseRogueInstance
 
     #region Handlers
 
-  public override void OnBattleStart(BattleInstance battle)
+ public override void OnBattleStart(BattleInstance battle)
+{
+    base.OnBattleStart(battle);
+
+    if (CurRoom == null) return;
+
+    // --- 1. 动态计算怪物等级 (核心：解决你说的等级过高问题) ---
+    // 根据 AreaProgress (世界) 和 Difficulty (难度) 动态计算等级
+    int progress = AreaExcel.AreaProgress;   // 世界几 (如 3)
+    int difficulty = AreaExcel.Difficulty;     // 难度几 (如 1)
+    
+    // 公式建议：世界基准等级 + (难度-1) * 10 + 随房间进度微增
+    // 示例：世界3 难度1 -> 30 + 0 + (13/2) ≈ 36级
+    // 示例：世界3 难度2 -> 30 + 10 + (13/2) ≈ 46级
+    uint targetLevel = (uint)(progress * 10 + (difficulty - 1) * 10 + 5 + (CurReachedRoom / 2));
+    
+    // 强制设置战斗等级，这会覆盖配置表里的默认等级
+    battle.Level = targetLevel;
+
+    // --- 2. 决定怪物组 (CustomLevel) ---
+    if (CurRoom.Excel.RogueRoomType == 7) 
     {
-        base.OnBattleStart(battle);
-
-        if (CurRoom == null) return;
-
-        // --- 核心修复：如果是 BOSS 房 (Type 7)，根据 RoomId 锁定怪物组 ---
-        if (CurRoom.Excel.RogueRoomType == 7) 
+        // BOSS 房：使用世界+难度的组合 ID
+        battle.CustomLevel = (progress * 100000) + (difficulty * 100) + 1;
+    }
+    else 
+    {
+        // 普通房：根据 MapId 获取怪物列表
+        // 确保 MapId 考虑了难度 (progress * 100 + difficulty)
+        int mapId = progress * 100 + difficulty;
+        
+        if (GameData.RogueMapData.TryGetValue(mapId, out var mapData))
         {
-            // 你可以在这里根据之前抽好的 RoomId 映射具体的怪物组 ID
-            // 怪物组 ID 通常在 RogueLevelConfig.json 中
-            battle.CustomLevel = CurRoom.RoomId switch {
-                231713 => 300101, // 杰帕德怪物组 ID 示例
-                121713 => 400101, // 史瓦罗怪物组 ID 示例
-                122713 => 800101, // 世界 8 真蛰虫示例
-                132713 => 900101, // 世界 9 “死亡”示例
-                _ => battle.CustomLevel
-            };
-            return; // 匹配到 BOSS 逻辑后直接返回
-        }
-
-        // 普通房间：维持原有逻辑，根据点位配置随机抽怪
-        GameData.RogueMapData.TryGetValue(AreaExcel.MapId, out var mapData);
-        if (mapData != null)
-        {
-            mapData.TryGetValue(CurRoom.SiteId, out var mapInfo);
-            if (mapInfo != null && mapInfo.LevelList.Count > 0) 
+            if (mapData.TryGetValue(CurRoom.SiteId, out var mapInfo) && mapInfo.LevelList.Count > 0)
             {
+                // 随机抽取一个怪物组合
                 battle.CustomLevel = mapInfo.LevelList.RandomElement();
             }
         }
     }
+    
+    // 调试打印：让你在服务器控制台看到当前的怪物强度
+    // Console.WriteLine($"[Rogue] 战斗开始: 世界{progress} 难度{difficulty} 房间进度{CurReachedRoom} -> 最终等级: {battle.Level}, 怪物组ID: {battle.CustomLevel}");
+}
 
     public override async ValueTask OnBattleEnd(BattleInstance battle, PVEBattleResultCsReq req)
     {
