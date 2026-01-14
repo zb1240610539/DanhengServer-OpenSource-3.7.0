@@ -9,6 +9,7 @@ using EggLink.DanhengServer.GameServer.Server.Packet.Send.Scene;
 using EggLink.DanhengServer.Proto;
 using EggLink.DanhengServer.Util;
 using EggLink.DanhengServer.Enums.Scene;
+using EggLink.DanhengServer.GameServer.Game.Rogue.Scene.Entity;
 namespace EggLink.DanhengServer.GameServer.Game.Scene.Entity;
 
 public class EntityMonster(
