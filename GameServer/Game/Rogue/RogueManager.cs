@@ -31,7 +31,24 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
         var endTime = beginTime.AddDays(7);
         return (beginTime.ToUnixSec(), endTime.ToUnixSec());
     }
+public int GetImmersiveRewardId()
+{
+    var instance = this.RogueInstance;
+    if (instance == null) return 0;
 
+    // 1. 获取基础掉落 ID (例如 301, 603)
+    // 根据你之前发的 Area 数据，这个字段叫 MonsterEliteDropDisplayID
+    int dropDisplayId = instance.AreaExcel.MonsterEliteDropDisplayID;
+
+    // 2. 映射到真正的奖励 RewardID
+    // 在星铁中，沉浸奖励的 RewardId 规律通常是：210000 + dropDisplayId
+    // 例如：世界 3 难度 1 -> 210301
+    //      世界 6 难度 3 -> 210603
+    int finalRewardId = 210000 + dropDisplayId;
+
+    // 3. 这里的 210xxx 系列 ID 会在 RewardData.excel 中定义具体的遗器掉落
+    return finalRewardId;
+}
    // 1. 获取分数并处理周重置逻辑
    public int GetRogueScore()
 {
