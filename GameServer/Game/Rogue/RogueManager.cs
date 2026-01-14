@@ -31,24 +31,8 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
         var endTime = beginTime.AddDays(7);
         return (beginTime.ToUnixSec(), endTime.ToUnixSec());
     }
-public int GetImmersiveRewardId()
-{
-    var instance = this.RogueInstance;
-    if (instance == null) return 0;
+	
 
-    // 1. 获取基础掉落 ID (例如 301, 603)
-    // 根据你之前发的 Area 数据，这个字段叫 MonsterEliteDropDisplayID
-    int dropDisplayId = instance.AreaExcel.MonsterEliteDropDisplayID;
-
-    // 2. 映射到真正的奖励 RewardID
-    // 在星铁中，沉浸奖励的 RewardId 规律通常是：210000 + dropDisplayId
-    // 例如：世界 3 难度 1 -> 210301
-    //      世界 6 难度 3 -> 210603
-    int finalRewardId = 210000 + dropDisplayId;
-
-    // 3. 这里的 210xxx 系列 ID 会在 RewardData.excel 中定义具体的遗器掉落
-    return finalRewardId;
-}
    // 1. 获取分数并处理周重置逻辑
    public int GetRogueScore()
 {
@@ -129,7 +113,62 @@ public int GetImmersiveRewardId()
         await Player.SendPacket(new PacketSyncRogueStatusScNotify(RogueInstance.Status));
         await Player.SendPacket(new PacketStartRogueScRsp(Player));
     }
+   private static readonly Dictionary<int, int[]> WorldToRelicSets = new()
+    {
+        { 1, [01, 02] }, // 世界3: 空间站(01), 仙舟(02)
+        { 2, [07, 08] }, // 世界4: 塔利亚(07), 翁瓦克(08)
+        { 3, [03, 09] }, // 世界5: 公司(03), 泰科铵(09)
+        { 4, [04, 06] }, // 世界6: 贝洛伯格(04), 停转(06)
+        { 5, [10, 05] }, // 世界7: 繁星(10), 龙骨(05)
+        { 6, [11, 12] }, // 世界8: 格拉默(11), 匹诺康尼(12)
+        { 7, [13, 14] }, // 世界9: 茨冈尼亚(13), 出云(14)
+    };
 
+    public async ValueTask GrantImmersiveRewards()
+    {
+        var instance = RogueInstance;
+        if (instance == null) return;
+
+        // 1. 获取基础数据
+        int progress = instance.AreaExcel.AreaProgress; // 世界几
+        int rogueDifficulty = instance.AreaExcel.Difficulty; // 模拟宇宙难度 (I-V)
+        int worldLevel = Player.Data.WorldLevel; // 玩家均衡等级 (0-6)
+
+        // 2. 决定遗器品质 (Rank)
+        // 逻辑：即使均衡等级高，如果打的是低难度世界，品质也会受限
+        // 这里我们可以根据 rogueDifficulty 来确定 ID 的首位 (3-6)
+        int rank;
+        if (rogueDifficulty >= 4) rank = 6;      // 难度4以上必给金 (63xxx)
+        else if (rogueDifficulty == 3) rank = 5; // 难度3给高概率金/紫 (53xxx)
+        else rank = 4;                           // 低难度给紫 (43xxx)
+
+        // 3. 获取对应世界的套装
+        if (!WorldToRelicSets.TryGetValue(progress, out var setIds))
+            setIds = [01, 02];
+
+        List<uint> itemIds = new();
+
+        // 4. 发放基础奖励 (球和绳)
+        foreach (var setId in setIds)
+        {
+            itemIds.Add((uint)((rank * 10000) + 3000 + (setId * 10) + 5)); // 球
+            itemIds.Add((uint)((rank * 10000) + 3000 + (setId * 10) + 6)); // 绳
+        }
+
+        // 5. 根据“难度”和“均衡等级”补发额外掉落 (模拟官服双金)
+        // 比如：难度5 且 均衡等级6，额外多给 1-2 个随机部位
+        if (rogueDifficulty >= 4 && worldLevel >= 5)
+        {
+            int extraSet = setIds[Random.Shared.Next(setIds.Length)];
+            itemIds.Add((uint)((rank * 10000) + 3000 + (extraSet * 10) + Random.Shared.Next(5, 7)));
+        }
+
+        // 执行发放
+        foreach (var id in itemIds)
+        {
+            await Player.InventoryManager!.AddItem(id, 1, notify: true);
+        }
+    }
     public BaseRogueInstance? GetRogueInstance()
     {
         if (RogueInstance != null)
