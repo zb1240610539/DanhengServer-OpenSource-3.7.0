@@ -32,6 +32,9 @@ public abstract class BaseRogueInstance(PlayerInstance player, RogueSubModeEnum 
     public int CurRerollCost { get; set; } = 30;
     public int BaseRerollCount { get; set; } = 1;
     public int BaseRerollFreeCount { get; set; } = 0;
+    // 新增：直接映射玩家数据中的沉浸器数量
+	// 这样在肉鸽实例的任何地方都能通过 instance.CurImmersionToken 拿到最新值
+	public int CurImmersionToken => (int)Player.Data.ImmersiveArtifact;
     public int CurMoney { get; set; } = 100;
     public int CurDestroyCount { get; set; }
     public int AeonId { get; set; } = 0;
