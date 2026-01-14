@@ -17,6 +17,13 @@ public class PacketSyncRogueCommonVirtualItemInfoScNotify : BasePacket
                 {
                     VirtualItemId = 31,
                     VirtualItemNum = (uint)instance.CurMoney
+                },
+                // 2. 同步沉浸券 (ID 33)
+                // 直接使用我们刚才在 instance 里定义的属性
+                new RogueCommonVirtualItemInfo
+                {
+                    VirtualItemId = 33,
+                    VirtualItemNum = (uint)instance.CurImmersionToken
                 }
             }
         };
