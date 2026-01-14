@@ -9,8 +9,10 @@ public class RogueAreaConfigExcel : ExcelResource
     public int AreaProgress { get; set; }
     public int Difficulty { get; set; }
     public int FirstReward { get; set; }
+    // --- 新增这个字段，对应 JSON 里的 MonsterEliteDropDisplayID ---
+    public int MonsterEliteDropDisplayID { get; set; }
     public Dictionary<int, int> ScoreMap { get; set; } = [];
-
+    
     [JsonIgnore] public int MapId { get; set; }
 
     [JsonIgnore] public Dictionary<int, RogueMapExcel> RogueMaps { get; set; } = [];
