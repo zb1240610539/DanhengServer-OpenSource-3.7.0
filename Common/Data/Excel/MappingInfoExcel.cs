@@ -26,8 +26,7 @@ public class MappingInfoExcel : ExcelResource
     {
         return ID * 10 + WorldLevel;
     }
-
-    public override void Loaded()
+	public override void Loaded()
     {
         GameData.MappingInfoData.Add(GetId(), this);
         if (DisplayItemList.Count == 0) return;
@@ -186,6 +185,7 @@ public class MappingInfoExcel : ExcelResource
                 }
         }
     }
+    
 
     public List<ItemData> GenerateRelicDrops()
     {
