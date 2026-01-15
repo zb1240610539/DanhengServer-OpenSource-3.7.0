@@ -15,6 +15,7 @@ using EggLink.DanhengServer.GameServer.Server.Packet.Send.Scene;
 using EggLink.DanhengServer.Proto;
 using EggLink.DanhengServer.Util;
 using EggLink.DanhengServer.Database;
+using EggLink.DanhengServer.Enums.Scene;
 using static EggLink.DanhengServer.GameServer.Plugin.Event.PluginEvent;
 
 namespace EggLink.DanhengServer.GameServer.Game.Battle;
