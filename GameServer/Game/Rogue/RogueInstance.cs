@@ -244,7 +244,7 @@ public class RogueInstance : BaseRogueInstance
         // 如果你改了 RogueRoomInstance，这里直接用 prevRoom.MapId
         // 如果没改，就用 GetMapIdFromAreaId(AreaExcel.RogueAreaID)
         // 为了稳妥，这里假设你已经在 RogueRoomInstance 里加了 MapId 字段
-        await Player.SendPacket(new PacketSyncRogueMapRoomScNotify(prevRoom, (uint)prevRoom.MapId));
+        await Player.SendPacket(new PacketSyncRogueMapRoomScNotify(prevRoom, prevRoom.MapId));
     }
 
     CurReachedRoom++;
@@ -261,7 +261,7 @@ public class RogueInstance : BaseRogueInstance
     }
 
     // 【只改这里】：同上，修复 MapId 为 0 的问题
-    await Player.SendPacket(new PacketSyncRogueMapRoomScNotify(CurRoom, (uint)CurRoom.MapId));
+    await Player.SendPacket(new PacketSyncRogueMapRoomScNotify(CurRoom, CurRoom.MapId));
 
     // 下面保持不变
     EventManager?.OnNextRoom();
