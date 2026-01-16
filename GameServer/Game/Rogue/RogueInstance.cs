@@ -378,9 +378,10 @@ public override async ValueTask OnBattleEnd(BattleInstance battle, PVEBattleResu
         IsWin = true;
         Console.WriteLine($"[Rogue] 检测到最终关卡胜利，准备发送通关通知...");
         // await Player.SendPacket(new PacketSyncRogueExploreWinScNotify());
-        await Player.RogueManager!.QuitRogue();
-        // 标记状态为完成，防止流程挂起
+		// 标记状态为完成，防止流程挂起
         Status = RogueStatus.Finish;
+        await QuitRogue();
+        
     }
     // 普通关卡的奖励已经由 DropManager 提前发过了，这里什么都不用写
 }
