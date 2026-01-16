@@ -12,7 +12,8 @@ public class RogueAreaConfigExcel : ExcelResource
     // --- 新增这个字段，对应 JSON 里的 MonsterEliteDropDisplayID ---
     public int MonsterEliteDropDisplayID { get; set; }
     public Dictionary<int, int> ScoreMap { get; set; } = [];
-    
+    // 只有加了这个，才能读取 JSON 里的 ChestDisplayItemList
+    public List<ItemInfo> ChestDisplayItemList { get; set; }
     [JsonIgnore] public int MapId { get; set; }
 
     [JsonIgnore] public Dictionary<int, RogueMapExcel> RogueMaps { get; set; } = [];
