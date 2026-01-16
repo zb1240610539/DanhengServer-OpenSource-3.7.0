@@ -330,10 +330,7 @@ public async ValueTask HandleBattleWinRewards(BattleInstance battle)
     // 处理沉浸奖励 (Artifacts)
     if (battle.MappingInfoId > 0)
     {
-        Console.WriteLine($"[Rogue] 检测到 Mapping奖励 ID: {battle.MappingInfoId}，开始异步入库...");
-        var items = await Player.InventoryManager!.HandleMappingInfo(battle.MappingInfoId, Player.Data.WorldLevel);
-        battle.RaidRewardItems.AddRange(items); 
-        Console.WriteLine($"[Rogue] 沉浸奖励发放成功。");
+       Console.WriteLine($"[Rogue] 关底 BOSS 结算，跳过普通奖励。");
     }
 }
 public override void OnBattleStart(BattleInstance battle)
