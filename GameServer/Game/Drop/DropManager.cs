@@ -158,4 +158,64 @@ public async ValueTask ProcessBattleRewards(BattleInstance battle, PVEBattleResu
             battle.RaidRewardItems.AddRange(items);
         }
     }
+	// DropManager.cs
+
+/// <summary>
+/// 【测试模式】模拟宇宙沉浸奖励发放 (根据 AreaID 和 难度 筛选)
+/// </summary>
+public async ValueTask GrantRogueImmersiveReward(RogueInstance rogue)
+{
+    if (rogue == null || rogue.AreaExcel.ChestDisplayItemList == null)
+    {
+        Console.WriteLine("[DropManager] 错误：没有找到掉落表，发放低保。");
+        await Player.InventoryManager!.AddItem(2, 2000);
+        return;
+    }
+
+    // 获取当前难度
+    int currentDifficulty = rogue.AreaExcel.Difficulty;
+    // 获取当前区域ID (用于日志)
+    int areaId = rogue.AreaExcel.RogueAreaID;
+
+    Console.WriteLine($"[DropManager] 开始计算奖励 -> AreaID: {areaId}, 难度: {currentDifficulty}");
+
+    int dropCount = 0;
+
+    foreach (var item in rogue.AreaExcel.ChestDisplayItemList)
+    {
+        // 1. 基础物品 (如信用点、经验材料)，ItemID 通常比较小 (< 30000)，直接发
+        if (item.ItemID < 30000)
+        {
+            int count = item.ItemNum > 0 ? item.ItemNum : 1;
+            await Player.InventoryManager!.AddItem(item.ItemID, count);
+            continue;
+        }
+
+        // 2. 核心掉落组 (83xxx 这种)
+        // 规则：ID 的最后一位数字 == 当前难度
+        // 例如：难度 1 只发 83011，不发 83012
+        if (item.ItemID % 10 == currentDifficulty)
+        {
+            // 数量通常是 0，这里默认给 1 个
+            // 如果你想双倍掉落，可以在这里改 count
+            int count = item.ItemNum > 0 ? item.ItemNum : 1;
+
+            await Player.InventoryManager!.AddItem(item.ItemID, count);
+            
+            Console.WriteLine($"[DropManager] 命中掉落组 -> ID: {item.ItemID} (匹配难度 {currentDifficulty})");
+            dropCount++;
+        }
+    }
+
+    if (dropCount == 0)
+    {
+        // 如果筛选完发现什么都没发 (可能是 ID 规律不对)，兜底发一个列表里的第一个高级物品
+        Console.WriteLine("[DropManager] 警告：没有匹配到当前难度的掉落，尝试发放列表第一个候选...");
+        var backupItem = rogue.AreaExcel.ChestDisplayItemList.FirstOrDefault(x => x.ItemID > 30000);
+        if (backupItem != null)
+        {
+             await Player.InventoryManager!.AddItem(backupItem.ItemID, 1);
+        }
+    }
+}
 }
