@@ -366,7 +366,7 @@ public override void OnBattleStart(BattleInstance battle)
     // 5. 【兜底逻辑】如果是 BOSS 房且没查到 Stage，再尝试硬编码公式
     // 注意：Boss 房类型通常是 5 (根据你的 RogueRoom.json)，不是 7
     // 或者判断没有下一关 (NextSiteIds.Count == 0)
-    if (targetStageId == 0 && (CurRoom.Excel.RogueRoomType == 5 || CurRoom.NextSiteIds.Count == 0))
+    if (targetStageId == 0 && (CurRoom.Excel.RogueRoomType == 7 || CurRoom.NextSiteIds.Count == 0))
     {
         int progress = AreaExcel.AreaProgress;
         int difficulty = AreaExcel.Difficulty;
