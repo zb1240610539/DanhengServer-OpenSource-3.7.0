@@ -36,7 +36,8 @@ public partial class PlayerInstance
     }
 
     public async ValueTask<EntityProp?> InteractProp(int propEntityId, int interactId)
-    {
+    {   // --- 日志 1: 收到交互请求 ---
+    	Console.WriteLine($"[Interact Debug] 收到请求 -> PropEntityId: {propEntityId}, InteractId: {interactId}");
         if (SceneInstance == null) return null;
         SceneInstance.Entities.TryGetValue(propEntityId, out var entity);
         if (entity is not EntityProp prop) return null;
