@@ -122,8 +122,7 @@ public async ValueTask ProcessBattleRewards(BattleInstance battle, PVEBattleResu
         // 2. 模拟宇宙 BOSS 沉浸奖励 (如果有关底 Mapping 奖励)
         if (battle.MappingInfoId > 0)
         {
-            var items = await Player.InventoryManager!.HandleMappingInfo(battle.MappingInfoId, battle.WorldLevel);
-            battle.RaidRewardItems.AddRange(items);
+            Console.WriteLine($"[Rogue] 关底 BOSS 结算，跳过普通奖励。");
         }
     }
 
