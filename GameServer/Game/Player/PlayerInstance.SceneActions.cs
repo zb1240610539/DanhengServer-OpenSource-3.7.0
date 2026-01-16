@@ -76,15 +76,26 @@ public partial class PlayerInstance
 
                 break;
            	case PropTypeEnum.PROP_ROGUE_REWARD_OBJECT:
-    
-    			{	
-        		if (player.DropManager != null)
-				{
-    			// 依然是这句话，DropManager 内部已经变聪明了
-    			await player.DropManager.GrantRogueImmersiveReward(rogueInstance);
-				}
-       
-    			}
+    			
+    			// 1. 获取肉鸽实例
+            // 使用 this.RogueManager 或者直接 RogueManager
+            var rogueInstance = this.RogueManager?.RogueInstance as RogueInstance;
+
+            if (rogueInstance != null)
+            {
+                // 2. 调用 DropManager 发奖
+                // 使用 this.DropManager 或者直接 DropManager
+                if (this.DropManager != null)
+                {
+                    Console.WriteLine($"[Interact] 触发沉浸奖励，调用 DropManager...");
+                    // 传入刚才获取的 rogueInstance 变量
+                    await this.DropManager.GrantRogueImmersiveReward(rogueInstance);
+                }
+            }
+            else
+            {
+                Console.WriteLine("[Interact Error] 玩家当前不在 Rogue 实例中");
+            }
     			break;
             case PropTypeEnum.PROP_DESTRUCT:
                 if (newState == PropStateEnum.Closed) await prop.SetState(PropStateEnum.Open);
