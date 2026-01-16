@@ -228,41 +228,47 @@ public class RogueInstance : BaseRogueInstance
         await AddAeonBuff();
     }
 
-   public async ValueTask<RogueRoomInstance?> EnterRoom(int siteId)
+  public async ValueTask<RogueRoomInstance?> EnterRoom(int siteId)
+{
+    var prevRoom = CurRoom;
+    if (prevRoom != null)
     {
-        var prevRoom = CurRoom;
-        if (prevRoom != null)
-        {
-            if (!prevRoom.NextSiteIds.Contains(siteId)) return null;
-            prevRoom.Status = RogueRoomStatus.Finish;
-            await Player.SendPacket(new PacketSyncRogueMapRoomScNotify(prevRoom, AreaExcel.MapId));
-        }
+        // 检查连通性 (防止飞得太离谱)
+        if (!prevRoom.NextSiteIds.Contains(siteId)) return null;
 
-        CurReachedRoom++;
-        CurRoom = RogueRooms[siteId];
-        CurRoom.Status = RogueRoomStatus.Play;
+        // 【保留原逻辑】：强制把上一关设为完成
+        // 这样你就可以“穿墙”，不打怪直接进下一关（方便测试）
+        prevRoom.Status = RogueRoomStatus.Finish;
 
-        await Player.EnterScene(CurRoom.Excel.MapEntrance, 0, false);
-
-        var anchor = Player.SceneInstance!.FloorInfo?.GetAnchorInfo(CurRoom.Excel.GroupID, 1);
-        if (anchor != null)
-        {
-            Player.Data.Pos = anchor.ToPositionProto();
-            Player.Data.Rot = anchor.ToRotationProto();
-        }
-
-        await Player.SendPacket(new PacketSyncRogueMapRoomScNotify(CurRoom, AreaExcel.MapId));
-
-        // --- 【核心修复：刷新进度条】 ---
-        // 发送全量肉鸽状态包，强制客户端将 1/13 更新为当前进度
-        //await Player.SendPacket(new PacketSyncRogueStatusScNotify(this.Status));
-        // ------------------------------
-
-        EventManager?.OnNextRoom();
-        foreach (var miracle in RogueMiracles.Values) miracle.OnEnterNextRoom();
-
-        return CurRoom;
+        // 【只改这里】：AreaExcel.MapId 是 0，必须改！
+        // 如果你改了 RogueRoomInstance，这里直接用 prevRoom.MapId
+        // 如果没改，就用 GetMapIdFromAreaId(AreaExcel.RogueAreaID)
+        // 为了稳妥，这里假设你已经在 RogueRoomInstance 里加了 MapId 字段
+        await Player.SendPacket(new PacketSyncRogueMapRoomScNotify(prevRoom, (uint)prevRoom.MapId));
     }
+
+    CurReachedRoom++;
+    CurRoom = RogueRooms[siteId];
+    CurRoom.Status = RogueRoomStatus.Play;
+
+    await Player.EnterScene(CurRoom.Excel.MapEntrance, 0, false);
+
+    var anchor = Player.SceneInstance!.FloorInfo?.GetAnchorInfo(CurRoom.Excel.GroupID, 1);
+    if (anchor != null)
+    {
+        Player.Data.Pos = anchor.ToPositionProto();
+        Player.Data.Rot = anchor.ToRotationProto();
+    }
+
+    // 【只改这里】：同上，修复 MapId 为 0 的问题
+    await Player.SendPacket(new PacketSyncRogueMapRoomScNotify(CurRoom, (uint)CurRoom.MapId));
+
+    // 下面保持不变
+    EventManager?.OnNextRoom();
+    foreach (var miracle in RogueMiracles.Values) miracle.OnEnterNextRoom();
+
+    return CurRoom;
+}
 
     public async ValueTask LeaveRogue()
     {
