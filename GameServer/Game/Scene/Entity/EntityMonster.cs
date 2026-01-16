@@ -29,7 +29,8 @@ public class EntityMonster(
     public MonsterInfo Info { get; set; } = info;
     public SceneBuff? TempBuff { get; set; }
     public bool IsAlive { get; private set; } = true;
-
+	// --- 新增：关联副本奖励 ID ---
+    public int AttachedMappingId { get; set; } = 0;
     public int EventId { get; set; } = info.EventID;
     public int CustomStageId { get; set; } = 0;
 
