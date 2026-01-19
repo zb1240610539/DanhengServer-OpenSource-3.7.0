@@ -118,29 +118,45 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
 	// =========================================================================
     // 【新增】通关结算：发奖励 + 解锁下一关 + 保存数据库
     // =========================================================================
-    public async ValueTask FinishRogue(int currentAreaId, bool isWin)
+   // --- 【修改 FinishRogue 方法】 ---
+public async ValueTask FinishRogue(int currentAreaId, bool isWin)
+{
+    if (!isWin) return;
+
+    Console.WriteLine($"[RogueManager] 战斗胜利，准备发放 AreaId: {currentAreaId} 的首通奖励...");
+
+    // 1. 获取当前关卡的配置
+    if (GameData.RogueAreaConfigData.TryGetValue(currentAreaId, out var areaConfig))
     {
-        if (!isWin) return;
+        int firstRewardId = areaConfig.FirstReward;
 
-        Console.WriteLine($"[RogueManager] 玩家通关 AreaId: {currentAreaId}, 开始结算...");
-
-        // 1. 发放 100 星琼 (ItemId: 1)
-        await Player.InventoryManager!.AddItem(1, 100, notify: true);
-        Console.WriteLine("[RogueManager] 已发放通关奖励: 星琼 x100");
-
-        // 2. 解锁下一关逻辑
-        // 假设关卡 ID 是按 10 递增的 (110 -> 120 -> 130...)
-        // 如果当前打通的关卡 >= 记录的进度，说明是推图，进度 +10
-        if (currentAreaId >= Player.Data.RogueUnlockProgress)
+        if (firstRewardId > 0)
         {
-            // 比如当前是 110，打完变成 120 (解锁下一关)
-            Player.Data.RogueUnlockProgress = currentAreaId + 10;
+            // 2. 调用 InventoryManager 的 HandleReward 发放物品
+            // sync: true 同步总额，notify: false 避免右侧弹出重复黑框
+            // 因为这些奖励会自动出现在 PVEBattleResultScRsp (战斗胜利大屏) 上
+            await Player.InventoryManager!.HandleReward(firstRewardId, notify: false, sync: true);
+            Console.WriteLine($"[RogueManager] 首通奖励 (ID: {firstRewardId}) 已处理。");
         }
+    }
+} 	
+	// --- 【新增 UpdateRogueProgress 方法】 ---
+public async ValueTask UpdateRogueProgress(int currentAreaId)
+{
+    Console.WriteLine($"[RogueManager] 玩家手动退出，正在更新关卡进度并保存数据库...");
 
-        // 3. 触发数据库保存
-        DatabaseHelper.ToSaveUidList.SafeAdd(Player.Uid);
-        Console.WriteLine($"[RogueManager] 进度已保存! 当前解锁至: {Player.Data.RogueUnlockProgress}");
-    }		
+    // 1. 解锁下一关逻辑
+    // 如果当前打通的关卡 >= 记录的进度，说明是推图成功，进度 +10
+    if (currentAreaId >= Player.Data.RogueUnlockProgress)
+    {
+        Player.Data.RogueUnlockProgress = currentAreaId + 10;
+        Console.WriteLine($"[RogueManager] 进度已更新! 当前最高解锁: {Player.Data.RogueUnlockProgress}");
+    }
+
+    // 2. 触发数据库保存
+    // 这样保证了奖励可以无限刷（因为不存奖励领取状态），但进度解锁是永久保存的
+    DatabaseHelper.ToSaveUidList.SafeAdd(Player.Uid);
+}
    private static readonly Dictionary<int, int[]> WorldToRelicSets = new()
     {
         { 1, [01, 02] }, // 世界3: 空间站(01), 仙舟(02)
