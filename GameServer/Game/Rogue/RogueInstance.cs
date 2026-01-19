@@ -318,7 +318,7 @@ public class RogueInstance : BaseRogueInstance
             if (difficulty == 0) difficulty = 1;
 
             int targetStageId = 80300000 + (worldIndex * 10) + difficulty;
-            if (worldIndex == 3) targetStageId = 80300031; 
+            if (worldIndex == 3) targetStageId = 80139011; 
             if (worldIndex == 4) targetStageId = 80300041; 
 
             if (targetStageId > 0 && GameData.StageConfigData.TryGetValue(targetStageId, out var stageConfig))
