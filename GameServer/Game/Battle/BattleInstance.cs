@@ -105,7 +105,7 @@ public class BattleInstance(PlayerInstance player, LineupInfo lineup, List<Stage
             await OnBattleEnd(this, BattleResult!);
     }
 
-    public List<ItemData> RogueFirstRewardItems { get; set; } = new(); // 命名规范：模拟宇宙首通奖励项
+    
 
 	public ItemList GetDropItemList()
 	{
