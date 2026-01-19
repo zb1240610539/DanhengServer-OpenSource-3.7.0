@@ -111,11 +111,12 @@ public class BattleInstance(PlayerInstance player, LineupInfo lineup, List<Stage
     var list = new ItemList();
     // 如果战斗没赢，直接返回空
     if (BattleEndStatus != BattleEndStatus.BattleEndWin) return list;
-
+	
     // 简单汇总：小怪掉落 + DropManager 之前算好的 Raid 奖励
     foreach (var item in MonsterDropItems) list.ItemList_.Add(item.ToProto());
     foreach (var item in RaidRewardItems) list.ItemList_.Add(item.ToProto());
-
+	foreach (var item in RogueFirstRewardItems) list.ItemList_.Add(item.ToProto());
+            
     return list;
 	}
 
