@@ -247,10 +247,10 @@ public class RogueInstance : BaseRogueInstance
         await Player.SendPacket(new PacketSyncRogueStatusScNotify(Status));
         await Player.SendPacket(new PacketSyncRogueFinishScNotify(ToFinishInfo()));
         
-        if (IsWin) 
-        {
-            await Player.RogueManager!.UpdateRogueProgress(AreaExcel.RogueAreaID);
-        }
+        //if (IsWin) 
+        //{
+        //    await Player.RogueManager!.UpdateRogueProgress(AreaExcel.RogueAreaID);
+        //}
 
         await LeaveRogue();
     }
@@ -272,7 +272,7 @@ public class RogueInstance : BaseRogueInstance
         }
     }
 
-    public override void OnBattleStart(BattleInstance battle)
+  public override void OnBattleStart(BattleInstance battle)
     {
         base.OnBattleStart(battle);
         if (CurRoom == null) return;
@@ -281,22 +281,42 @@ public class RogueInstance : BaseRogueInstance
         battle.MappingInfoId = 0;
         battle.StaminaCost = 0;
 
-        int worldIndex = (AreaExcel.RogueAreaID / 10) % 10;
-        int difficulty = AreaExcel.Difficulty; 
-        if (difficulty == 0) difficulty = 1;
+        // =========================================================
+        // 【等级逻辑】修复 85 级 BUG
+        // =========================================================
 
+        // 1. 获取基准等级
         int baseLevel = AreaExcel.RecommendLevel;
+
+        // 2. 兜底
         if (baseLevel == 0) 
         {
-             baseLevel = 35 + ((worldIndex > 3 ? worldIndex - 3 : 0) * 5) + ((difficulty - 1) * 10);
+            int difficulty = AreaExcel.Difficulty;
+            if (difficulty == 0) difficulty = 1;
+            baseLevel = difficulty * 10;
         }
-        int targetLevel = baseLevel + (CurReachedRoom / 2);
-        battle.CustomLevel = CurRoom.MonsterLevel > 0 ? CurRoom.MonsterLevel : targetLevel;
+
+        // 3. 【核心修复】层数成长
+        // 错误写法: CurRoom.SiteId (BOSS房是 111，导致 +55级)
+        // 正确写法: CurReachedRoom (记录实际走的步数，BOSS房是 13，+6级)
+        int addLevel = CurReachedRoom > 1 ? (CurReachedRoom / 2) : 0;
         
-        bool isBossStage = CurRoom.Excel.RogueRoomType == 7 || CurRoom.SiteId == 13;
+        // 4. 强制赋值
+        battle.CustomLevel = baseLevel + addLevel;
+
+        Console.WriteLine($"[RogueLevel] 战斗等级修正 -> 推荐:{baseLevel} 层数:{CurReachedRoom}(原SiteId:{CurRoom.SiteId}) 加成:{addLevel} 最终:{battle.CustomLevel}");
+
+        // =========================================================
+        // 【BOSS 数据注入逻辑】(保持不变)
+        // =========================================================
+        bool isBossStage = CurRoom.Excel.RogueRoomType == 7 || CurRoom.SiteId == 13 || CurRoom.SiteId == 111 || CurRoom.SiteId == 112;
 
         if (isBossStage) 
         {
+            int worldIndex = (AreaExcel.RogueAreaID / 10) % 10;
+            int difficulty = AreaExcel.Difficulty;
+            if (difficulty == 0) difficulty = 1;
+
             int targetStageId = 80300000 + (worldIndex * 10) + difficulty;
             if (worldIndex == 3) targetStageId = 80300031; 
             if (worldIndex == 4) targetStageId = 80300041; 

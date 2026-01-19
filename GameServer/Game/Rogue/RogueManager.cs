@@ -122,28 +122,159 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
 	// =========================================================================
 // 【修改后】通关发奖：返回物品列表供结算大屏展示
 // =========================================================================
-public async ValueTask<List<ItemData>> FinishRogue(int currentAreaId, bool isWin)
+// =========================================================================
+    // 【核心修正】FinishRogue: 使用进度值判断是否首通，不占用积分字段
+    // =========================================================================
+   // =========================================================================
+    // 【核心逻辑】FinishRogue: 进度检查 + 难度获取 + 权重掉落
+    // =========================================================================
+    // =========================================================================
+    // 【修复版】FinishRogue: 修复 uint -> int 类型转换错误
+    // =========================================================================
+    public async ValueTask<List<ItemData>> FinishRogue(int currentAreaId, bool isWin)
     {
         List<ItemData> totalRewards = new();
         if (!isWin) return totalRewards;
 
-        
+        // 1. 进度检查
+        if (currentAreaId < Player.Data.RogueUnlockProgress)
+        {
+            Console.WriteLine($"[RogueManager] AreaId: {currentAreaId} 已首通(进度:{Player.Data.RogueUnlockProgress})，本次无奖励。");
+            return totalRewards; 
+        }
+
+        Console.WriteLine($"[RogueManager] 首次通关 AreaId: {currentAreaId}，准备计算奖励...");
 
         if (GameData.RogueAreaConfigData.TryGetValue(currentAreaId, out var areaConfig))
         {
-            int firstRewardId = areaConfig.FirstReward;
-            if (firstRewardId > 0)
+            // 获取难度
+            int difficulty = areaConfig.Difficulty; 
+            if (difficulty == 0) difficulty = 1;
+
+            // 2. 奖励分流
+            if (currentAreaId < 130)
             {
-                // 【修改这里】notify: false (关掉右侧小黑框)
-                // sync: true (保留左上角数字刷新)
-                var rewards = await Player.InventoryManager!.HandleReward(firstRewardId, notify: false, sync: true);
+                // [世界1、2] 读取 Excel
+                int firstRewardId = areaConfig.FirstReward;
+                if (firstRewardId > 0)
+                {
+                    var rewards = await Player.InventoryManager!.HandleReward(firstRewardId, notify: true, sync: true);
+                    if (rewards != null) totalRewards.AddRange(rewards);
+                }
+            }
+            else
+            {
+                // [世界3及以后] 权重随机
+                int worldIndex = (currentAreaId - 100) / 10; 
                 
-                if (rewards != null) totalRewards.AddRange(rewards);
+                var relicRewards = GenerateWorldRelicRewards(worldIndex, difficulty);
+                
+                foreach (var item in relicRewards)
+                {
+                    // 【核心修复】这里加了 (int) 强制转换
+                    var reward = await Player.InventoryManager!.AddItem(item.ItemId, (int)item.Count, notify: true, sync: true);
+                    
+                    if (reward != null) totalRewards.Add(reward);
+                }
+                Console.WriteLine($"[Rogue] 世界{worldIndex} (难度{difficulty}) 权重奖励发放完成，共 {totalRewards.Count} 个物品");
+            }
+
+            // 3. 更新进度
+            if (currentAreaId >= Player.Data.RogueUnlockProgress)
+            {
+                Player.Data.RogueUnlockProgress = currentAreaId + 10;
+                Console.WriteLine($"[RogueManager] 进度解锁更新至: {Player.Data.RogueUnlockProgress}");
+                DatabaseHelper.ToSaveUidList.SafeAdd(Player.Uid);
             }
         }
-        
+
         await System.Threading.Tasks.Task.CompletedTask;
         return totalRewards; 
+    }
+
+    // =========================================================================
+    // 【新增辅助方法】下面全是新加的，建议放在 FinishRogue 下面
+    // =========================================================================
+
+    // 1. 主生成逻辑
+    private List<ItemData> GenerateWorldRelicRewards(int worldIndex, int difficulty)
+    {
+        List<ItemData> list = new();
+
+        // A. 决定掉落数量 (权重随机：2个 or 3个)
+        int count = GetWeightedDropCount(difficulty);
+
+        // B. 获取该世界的套装列表
+        int[] setIds = GetWorldRelicSets(worldIndex);
+
+        // C. 循环生成
+        for (int i = 0; i < count; i++)
+        {
+            // 决定品质 (权重随机：蓝/紫/金)
+            int rank = GetWeightedRarity(difficulty);
+
+            // 63xxx(蓝), 62xxx(紫), 61xxx(金)
+            int baseIdPrefix = rank switch { 5 => 61000, 4 => 62000, _ => 63000 };
+
+            // 随机套装 + 随机部位
+            int setId = setIds[Random.Shared.Next(setIds.Length)];
+            int part = Random.Shared.Next(5, 7); // 5=球, 6=绳
+            
+            int relicId = baseIdPrefix + (setId * 10) + part;
+            list.Add(new ItemData { ItemId = relicId, Count = 1 });
+        }
+
+        // D. 随机附赠遗器经验 (数量随难度波动)
+        int expCount = difficulty * Random.Shared.Next(2, 5); 
+        list.Add(new ItemData { ItemId = 235, Count = (int)expCount });
+
+        return list;
+    }
+
+    // 2. 计算掉落数量权重
+    private int GetWeightedDropCount(int difficulty)
+    {
+        int roll = Random.Shared.Next(0, 100);
+        if (difficulty >= 5) return roll < 80 ? 3 : 2; // 难度5+: 80%几率掉3个
+        if (difficulty >= 3) return roll < 30 ? 3 : 2; // 难度3-4: 30%几率掉3个
+        return 2; // 低难度固定2个
+    }
+
+    // 3. 计算品质权重 (核心概率表)
+    private int GetWeightedRarity(int difficulty)
+    {
+        int roll = Random.Shared.Next(0, 100);
+        switch (difficulty)
+        {
+            case 1: // 难度1: 20%紫, 80%蓝
+                return roll < 20 ? 4 : 3;
+            case 2: // 难度2: 5%金, 55%紫, 40%蓝
+                if (roll < 5) return 5;
+                if (roll < 60) return 4;
+                return 3;
+            case 3: // 难度3: 30%金, 70%紫
+                return roll < 30 ? 5 : 4;
+            case 4: // 难度4: 60%金, 40%紫
+                return roll < 60 ? 5 : 4;
+            default: // 难度5+: 85%金, 15%紫
+                return roll < 85 ? 5 : 4;
+        }
+    }
+
+    // 4. 获取世界套装映射
+    private int[] GetWorldRelicSets(int worldIndex)
+    {
+        return worldIndex switch
+        {
+            3 => [305, 309], // 太空, 仙舟
+            4 => [306, 308], // 盗贼, 翁瓦克
+            5 => [307, 310], // 公司, 星体
+            6 => [311, 312], // 萨尔索图, 贝洛伯格
+            7 => [313, 314], // 繁星, 龙骨
+            8 => [315, 316], // 苍穹, 匹诺康尼
+            9 => [317, 318], // 出云, 荒星
+            _ => [305, 309]
+        };
     }
 	// --- 【新增 UpdateRogueProgress 方法】 ---
 public async ValueTask UpdateRogueProgress(int currentAreaId)

@@ -130,7 +130,9 @@ public class RogueRoomInstance
         return index switch
         {
             // // 世界1 前缀 3 (对应 301)
-            3 => 3, 
+			1 => 3, 
+			2 => 3, 
+            3 => 1111, 
             
             // 世界 4: 也用 2111 (大房间前缀)
             4 => 2111, 
@@ -148,7 +150,9 @@ public class RogueRoomInstance
         return index switch
         {
             //
-            3 => 307, 
+			1 => 307, 
+			2 => 307, 
+            3 => 111713, 
             
             // 世界 4 (史瓦罗): 也用 211713 (大房间)
             // 没错，两个世界共用同一个房间地图！区别在于刷出来的怪。
