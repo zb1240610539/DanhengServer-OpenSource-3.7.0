@@ -145,14 +145,39 @@ public class RogueInstance : BaseRogueInstance
     #region Methods
     public async ValueTask HandleBattleWinRewards(BattleInstance battle)
     {
-        bool isFinalBoss = CurRoom?.Excel.RogueRoomType == 7;
-        if (!isFinalBoss)
+       // 1. 判断是否是最终 BOSS
+    bool isFinalBoss = CurRoom?.Excel.RogueRoomType == 7 || CurRoom?.SiteId == 13;
+
+    if (isFinalBoss)
+    {
+        // --- 核心逻辑：注入首通奖励到结算大屏 ---
+        Console.WriteLine($"[Rogue-Drop] 检测到最终BOSS胜利，正在注入首通奖励 ID: {AreaExcel.FirstReward}");
+        
+        // 调用 HandleReward 拿到增量列表 (sync 设为 true 确保总额刷新)
+        var firstPassRewards = await Player.InventoryManager!.HandleReward(AreaExcel.FirstReward, notify: false, sync: true);
+        
+        // 将奖励加入 battle 的奖励池，这样 PVEBattleResultScRsp 就会自动包含这些物品
+        if (firstPassRewards != null && firstPassRewards.Count > 0)
         {
-            int waveCount = Math.Max(1, battle.Stages.Count);
-            var money = Random.Shared.Next(20, 60) * waveCount;
-            await GainMoney(money);
-            await RollBuff(1); 
+            battle.RaidRewardItems.AddRange(firstPassRewards); 
         }
+
+        // 标记通关状态，但不直接退出
+        IsWin = true;
+        Status = RogueStatus.Finish;
+        await Player.SendPacket(new PacketSyncRogueStatusScNotify(Status));
+
+        // 【关键】：这里不执行任何 GainMoney 或 RollBuff，所以不会有 Buff 三选一弹窗
+        Console.WriteLine("[Rogue-Drop] 最终关卡：已发放奖励，拦截 Buff 选择弹窗。");
+    }
+    else
+    {
+        // 2. 普通房间逻辑：给钱 + 弹 Buff
+        int waveCount = Math.Max(1, battle.Stages.Count);
+        var money = Random.Shared.Next(20, 60) * waveCount;
+        await GainMoney(money);
+        await RollBuff(1); 
+    }
     }
 
     // --- 核心修改：统一使用长图 Map ID (200) ---
@@ -326,27 +351,25 @@ public class RogueInstance : BaseRogueInstance
 
     public override async ValueTask OnBattleEnd(BattleInstance battle, PVEBattleResultCsReq req)
     {
-        foreach (var miracle in RogueMiracles.Values) miracle.OnEndBattle(battle);
+      foreach (var miracle in RogueMiracles.Values) miracle.OnEndBattle(battle);
 
-        if (req.EndStatus != BattleEndStatus.BattleEndWin)
-        {
-            await QuitRogue();
-            return;
-        }
+    // 战斗失败处理
+    if (req.EndStatus != BattleEndStatus.BattleEndWin)
+    {
+        await QuitRogue();
+        return;
+    }
 
-        if (CurRoom!.NextSiteIds.Count == 0)
-        {
-            IsWin = true;
-            Status = RogueStatus.Finish;
-            await QuitRogue();
-        }
-        else
-        {
-            int waveCount = Math.Max(1, battle.Stages.Count);
-            var money = Random.Shared.Next(20, 60) * waveCount;
-            await GainMoney(money);
-            await RollBuff(1);
-        }
+    // 检查是否是 BOSS 房
+    bool isFinalBoss = CurRoom!.NextSiteIds.Count == 0 || CurRoom.Excel.RogueRoomType == 7;
+
+    if (isFinalBoss)
+    {
+        // 注意：这里【不要】调用 QuitRogue()，也不要在这里发奖（交给上面的 HandleBattleWinRewards）
+        // 只需要确保玩家不被踢出场景即可。
+        Console.WriteLine("[Rogue] 战斗结束，等待结算包下发，玩家留守场景。");
+    }
+    // 普通怪物的逻辑会自动在 DropManager 里触发 RollBuff
     }
     #endregion
 
