@@ -519,42 +519,50 @@ public class InventoryManager(PlayerInstance player) : BasePlayerManager(player)
         }
         Console.WriteLine("=========================================================\n");
         // ===============================================
-
-        // 2. 计算普通道具掉落 (里程、信用点、材料)
-        foreach (var item in mapping.DropItemList)
+		// 2. 开始波次大循环 (独立判定核心)
+for (int i = 0; i < wave; i++)
+{
+    // --- A. 普通道具独立抽取 ---
+    foreach (var item in mapping.DropItemList)
+    {
+        // 每一波都重新 Roll 一次概率 (真正的独立判定)
+        if (Random.Shared.Next(0, 101) <= item.Chance)
         {
-            // 判定掉落概率
-            if (Random.Shared.Next(0, 101) <= item.Chance)
-            {
-                // 计算单次基础数量
-                var amount = item.ItemNum > 0 ? item.ItemNum : Random.Shared.Next(item.MinCount, item.MaxCount + 1);
-                
-                // 倍率控制
-                var multiplier = (item.ItemID == 22 || item.ItemID == 2) ? 1 : ConfigManager.Config.ServerOption.ValidFarmingDropRate();
-                
-                var finalCount = amount * multiplier * wave; 
+            // 每一波的基础数量也是独立随机的
+            var amount = item.ItemNum > 0 ? item.ItemNum : Random.Shared.Next(item.MinCount, item.MaxCount + 1);
+            
+            // 全局倍率依然生效 (例如双倍掉落活动)
+            var multiplier = (item.ItemID == 22 || item.ItemID == 2) ? 1 : ConfigManager.Config.ServerOption.ValidFarmingDropRate();
+            
+            var currentWaveCount = amount * multiplier;
 
-                var dbItem = await AddItem(item.ItemID, finalCount, notify: false, sync: false, returnRaw: true);
-                
-                if (dbItem != null)
-                {
-                    var displayItem = dbItem.Clone();
-                    displayItem.Count = finalCount; 
-                    resItems.Add(displayItem);
-                }
-            }
+            // 记录到临时列表，稍后统一合并或直接添加
+            // 注意：这里我们先存起来，最后再统一 AddItem 效率更高
+            totalCountMap[item.ItemID] = totalCountMap.GetValueOrDefault(item.ItemID) + currentWaveCount;
         }
+    }
 
-        // 3. 处理遗器掉落
-        for (int i = 0; i < wave; i++)
-        {
-            var relicDrops = mapping.GenerateRelicDrops();
-            foreach (var relic in relicDrops)
-            {
-                var dbRelic = await AddItem(relic.ItemId, 1, notify: false, sync: false, returnRaw: true);
-                if (dbRelic != null) resItems.Add(dbRelic);
-            }
-        }
+    // --- B. 遗器独立抽取 (你原来的逻辑已经很棒了) ---
+    var relicDrops = mapping.GenerateRelicDrops();
+    foreach (var relic in relicDrops)
+    {
+        // 遗器必须立即 AddItem，因为每个都要生成唯一 UID
+        var dbRelic = await AddItem(relic.ItemId, 1, notify: false, sync: false, returnRaw: true);
+        if (dbRelic != null) resItems.Add(dbRelic);
+    }
+}
+
+	// 3. 最后统一结算普通道具 (减少数据库写入压力)
+	foreach (var kvp in totalCountMap)
+	{
+    var dbItem = await AddItem(kvp.Key, kvp.Value, notify: false, sync: false, returnRaw: true);
+    if (dbItem != null)
+    {
+        var displayItem = dbItem.Clone();
+        displayItem.Count = kvp.Value; 
+        resItems.Add(displayItem);
+    }
+      
 
         return resItems; 
     }
