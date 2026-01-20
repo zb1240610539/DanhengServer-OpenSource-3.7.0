@@ -91,39 +91,46 @@ public class RogueEntityLoader(SceneInstance scene, PlayerInstance player) : Sce
         return npc;
     }
 
-    public override async ValueTask<EntityMonster?> LoadMonster(MonsterInfo info, GroupInfo group,
-        bool sendPacket = false)
+   public override async ValueTask<EntityMonster?> LoadMonster(MonsterInfo info, GroupInfo group, bool sendPacket = false)
+{
+    if (info.IsClientOnly || info.IsDelete) return null;
+    
+    var instance = Player.RogueManager?.GetRogueInstance();
+    if (instance is RogueInstance rogueInstance)
     {
-        if (info.IsClientOnly || info.IsDelete) return null;
-        var instance = Player.RogueManager?.GetRogueInstance();
-        if (instance is RogueInstance rogueInstance)
+        var room = rogueInstance.CurRoom;
+        if (room == null) return null;
+
+        // 【修复 1】: 处理随机生成的房间找不到 Content 的情况
+        if (!room.Excel.GroupWithContent.TryGetValue(group.Id, out var content))
         {
-            var room = rogueInstance.CurRoom;
-            if (room == null) return null;
-
-            var content = room.Excel?.GroupWithContent[group.Id];
-            if (content == null) return null;
-
-            GameData.RogueMonsterData.TryGetValue((int)(content * 10 + 1), out var rogueMonster);
-            if (rogueMonster == null) return null;
-
-            GameData.NpcMonsterDataData.TryGetValue(rogueMonster.NpcMonsterID, out var excel);
-            if (excel == null) return null;
-
-            EntityMonster entity =
-                new(Scene, info.ToPositionProto(), info.ToRotationProto(), group.Id, info.ID, excel, info)
-                {
-                    EventId = rogueMonster.EventID,
-                    CustomStageId = rogueMonster.EventID
-                };
-
-            await Scene.AddEntity(entity, sendPacket);
-
-            return entity;
+            // 如果找不到，尝试取第一个可用的 Content，或者给一个保底的 ID
+            content = room.Excel.GroupWithContent.Values.FirstOrDefault();
+            if (content == 0) return null; // 彻底没配置才跳过
         }
 
-        return null;
+        // 获取怪物配置
+        GameData.RogueMonsterData.TryGetValue((int)(content * 10 + 1), out var rogueMonster);
+        if (rogueMonster == null) return null;
+
+        GameData.NpcMonsterDataData.TryGetValue(rogueMonster.NpcMonsterID, out var excel);
+        if (excel == null) return null;
+
+        // 【修复 2】: 强制对齐 GroupId
+        // 使用当前正在加载的 group.Id (这个 ID 是地图中门所在的真实 ID)
+        // 这样打完怪后，DropManager 就能通过 monster.GroupId 找到同一个组里的门了
+        EntityMonster entity = new(Scene, info.ToPositionProto(), info.ToRotationProto(), group.Id, info.ID, excel, info)
+        {
+            EventId = rogueMonster.EventID,
+            CustomStageId = rogueMonster.EventID
+        };
+
+        await Scene.AddEntity(entity, sendPacket);
+        return entity;
     }
+
+    return null;
+}
 
     public override async ValueTask<EntityProp?> LoadProp(PropInfo info, GroupInfo group, bool sendPacket = false)
     {
@@ -162,8 +169,20 @@ public class RogueEntityLoader(SceneInstance scene, PlayerInstance player) : Sce
                     _ => 1021
                 };
             }
-
-            await prop.SetState(PropStateEnum.CheckPointDisable);
+			
+        var roomType = room.Excel?.RogueRoomType ?? 0;
+    
+		// 3: 事件, 5: 商店, 8: 休息/BOSS前, 10: 遭遇(如果遭遇也要进门即开的话)
+		if (roomType == 3 || roomType == 5 || roomType == 4 || roomType == 8)
+		{
+        // 非战斗类房间，初始化即为开启状态
+        await prop.SetState(PropStateEnum.Open);
+		}
+		else
+		{
+        // 其他房间（如战斗房）初始为关闭，等待战斗结束触发
+        await prop.SetState(PropStateEnum.Closed);
+		}
         }
         else
         {

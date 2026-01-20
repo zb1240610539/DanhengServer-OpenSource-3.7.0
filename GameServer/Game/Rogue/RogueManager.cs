@@ -167,101 +167,89 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
     // 【修改后的 FinishRogue】
     // 逻辑：通关结算 -> 检查是否首通 -> 发奖 -> 记录通关ID
     // =========================================================================
-    public async ValueTask<List<ItemData>> FinishRogue(int currentAreaId, bool isWin)
+ public async ValueTask<List<ItemData>> FinishRogue(int currentAreaId, bool isWin)
+{
+    List<ItemData> totalRewards = new();
+    
+    // 1. 基础校验
+    if (!isWin) return totalRewards;
+    if (!GameData.RogueAreaConfigData.TryGetValue(currentAreaId, out var areaConfig)) return totalRewards;
+
+    int difficulty = areaConfig.Difficulty > 0 ? areaConfig.Difficulty : 1;
+    int worldIndex = (currentAreaId - 100) / 10;
+
+    // --- 2. 常规奖励：手动生成遗器 (只要打通世界 3 及以上就发) ---
+    if (currentAreaId >= 130)
     {
-        List<ItemData> totalRewards = new();
-        
-        // 1. 如果没打赢，直接返回空
-        if (!isWin) return totalRewards;
-
-        // 获取已通关列表
-        var clearedSet = GetClearedAreaIds();
-
-        // 2. 检查首通状态
-        // 如果列表里已经有这个 ID，说明以前通过关，领过首通奖了 -> 跳过奖励
-        if (clearedSet.Contains(currentAreaId))
+        var relicRewards = GenerateWorldRelicRewards(worldIndex, difficulty);
+        foreach (var item in relicRewards)
         {
-            Console.WriteLine($"[RogueManager] AreaId: {currentAreaId} 已在通关记录中，本次无首通奖励。");
-            return totalRewards; 
-        }
-
-        Console.WriteLine($"[RogueManager] 首次通关 AreaId: {currentAreaId}，准备发放首通奖励...");
-
-        if (GameData.RogueAreaConfigData.TryGetValue(currentAreaId, out var areaConfig))
-        {
-            // 获取难度 (防错处理)
-            int difficulty = areaConfig.Difficulty; 
-            if (difficulty == 0) difficulty = 1;
-
-            // --- 奖励分流逻辑 (这部分和你之前的一样) ---
-            if (currentAreaId < 130)
-            {
-                // [世界1、2] 读取 Excel 固定奖励
-                int firstRewardId = areaConfig.FirstReward;
-                if (firstRewardId > 0)
-                {
-                    var rewards = await Player.InventoryManager!.HandleReward(firstRewardId, notify: true, sync: true);
-                    if (rewards != null) totalRewards.AddRange(rewards);
-                }
-            }
-            else
-            {
-                // [世界3及以后] 权重随机奖励
-                int worldIndex = (currentAreaId - 100) / 10; 
-                var relicRewards = GenerateWorldRelicRewards(worldIndex, difficulty);
-                
-                foreach (var item in relicRewards)
-                {
-                    // 注意这里用了 (int) 强转防止报错
-                    var reward = await Player.InventoryManager!.AddItem(item.ItemId, (int)item.Count, notify: true, sync: true);
-                    
-                    if (reward != null) totalRewards.Add(reward);
-                }
-                Console.WriteLine($"[Rogue] 世界{worldIndex} (难度{difficulty}) 权重奖励发放完成，共 {totalRewards.Count} 个物品");
-            }
-
-            // 3. 【核心修改】保存进度
-            // 发完奖后，把这个 ID 存入数据库，下次就不发了
-            SaveClearedAreaId(currentAreaId);
-        }
-
-        await System.Threading.Tasks.Task.CompletedTask;
-        return totalRewards; 
-    }
-    // 1. 主生成逻辑
-    private List<ItemData> GenerateWorldRelicRewards(int worldIndex, int difficulty)
-    {
-        List<ItemData> list = new();
-
-        // A. 决定掉落数量 (权重随机：2个 or 3个)
-        int count = GetWeightedDropCount(difficulty);
-
-        // B. 获取该世界的套装列表
-        int[] setIds = GetWorldRelicSets(worldIndex);
-
-        // C. 循环生成
-        for (int i = 0; i < count; i++)
-        {
-            // 决定品质 (权重随机：蓝/紫/金)
-            int rank = GetWeightedRarity(difficulty);
-
-            // 63xxx(蓝), 62xxx(紫), 61xxx(金)
-            int baseIdPrefix = rank switch { 5 => 61000, 4 => 62000, _ => 63000 };
-
-            // 随机套装 + 随机部位
-            int setId = setIds[Random.Shared.Next(setIds.Length)];
-            int part = Random.Shared.Next(5, 7); // 5=球, 6=绳
+            // 【修复关键】：只传 3 个参数 (itemId, count, notify)
+            // 这样能匹配大多数版本的 AddItem 定义，避免 bool 到 int 的转换错误
+            var reward = await Player.InventoryManager!.AddItem(item.ItemId, (int)item.Count, true);
             
-            int relicId = baseIdPrefix + (setId * 10) + part;
-            list.Add(new ItemData { ItemId = relicId, Count = 1 });
+            if (reward != null) 
+            {
+                // 必须 Add 进 totalRewards，结算大框才会显示图标
+                totalRewards.Add(reward); 
+            }
+        }
+        Console.WriteLine($"[Rogue-Drop] 世界{worldIndex} 常规掉落已发放。");
+    }
+
+    // --- 3. 首通奖励：统一用 HandleReward 发放 (只领一次) ---
+    var clearedSet = GetClearedAreaIds();
+    if (!clearedSet.Contains(currentAreaId))
+    {
+        Console.WriteLine($"[RogueManager] 首次通关 AreaId: {currentAreaId}，发放首通奖励...");
+
+        int firstRewardId = areaConfig.FirstReward;
+        if (firstRewardId > 0)
+        {
+            // HandleReward 内部会处理克隆并返回 UI 显示用的增量列表
+            var firsts = await Player.InventoryManager!.HandleReward(firstRewardId, notify: true, sync: true);
+            if (firsts != null) 
+            {
+                totalRewards.AddRange(firsts);
+            }
         }
 
-        // D. 随机附赠遗器经验 (数量随难度波动)
-        int expCount = difficulty * Random.Shared.Next(2, 5); 
-        list.Add(new ItemData { ItemId = 235, Count = (int)expCount });
-
-        return list;
+        // 保存首通记录
+        SaveClearedAreaId(currentAreaId);
     }
+    else
+    {
+        Console.WriteLine($"[RogueManager] 非首次通关，仅发放常规掉落。");
+    }
+
+    return totalRewards;
+}
+    // 1. 主生成逻辑
+private List<ItemData> GenerateWorldRelicRewards(int worldIndex, int difficulty)
+{
+    List<ItemData> list = new();
+    int count = GetWeightedDropCount(difficulty);
+    int[] setIds = GetWorldRelicSets(worldIndex);
+
+    for (int i = 0; i < count; i++)
+    {
+        int rank = GetWeightedRarity(difficulty);
+        int rankPrefix = rank switch { 5 => 6, 4 => 5, _ => 4 };
+        int setId = setIds[Random.Shared.Next(setIds.Length)];
+        int part = Random.Shared.Next(5, 7); // 5=球, 6=绳
+
+        // 拼接公式：品质(1位) + 套装(3位) + 部位(1位) 
+        // 例如：6 * 10000 + 314 * 10 + 5 = 63145 (出云球)
+        int relicId = (rankPrefix * 10000) + (setId * 10) + part;
+        list.Add(new ItemData { ItemId = relicId, Count = 1 });
+    }
+
+    // 附赠经验素材 ID：233 为遗器精金
+    list.Add(new ItemData { ItemId = 233, Count = difficulty * 2 });
+    return list;
+}
+
+
 
     // 2. 计算掉落数量权重
     private int GetWeightedDropCount(int difficulty)
@@ -293,21 +281,20 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
         }
     }
 
-    // 4. 获取世界套装映射
-    private int[] GetWorldRelicSets(int worldIndex)
+   private int[] GetWorldRelicSets(int worldIndex)
+{
+    // worldIndex 通常是 (currentAreaId - 100) / 10
+    // 例如：Area 130 -> worldIndex 3
+    return worldIndex switch
     {
-        return worldIndex switch
-        {
-            3 => [305, 309], // 太空, 仙舟
-            4 => [306, 308], // 盗贼, 翁瓦克
-            5 => [307, 310], // 公司, 星体
-            6 => [311, 312], // 萨尔索图, 贝洛伯格
-            7 => [313, 314], // 繁星, 龙骨
-            8 => [315, 316], // 苍穹, 匹诺康尼
-            9 => [317, 318], // 出云, 荒星
-            _ => [305, 309]
-        };
-    }
+        3 => [301, 302], // 3015/3016 (黑塔), 3025/3026 (仙舟)
+        4 => [307, 308], // 3075 (公司), 3085 (翁瓦克)
+        5 => [303, 305], // 3035 (贸易), 3055 (螺丝)
+        6 => [306, 304], // 3065 (萨尔索图), 3045 (贝洛伯格)
+        9 => [314, 313], // 3145 (出云), 3135 (茨冈尼亚)
+        _ => [301, 302]
+    };
+}
 	// --- 【新增 UpdateRogueProgress 方法】 ---
 	public async ValueTask UpdateRogueProgress(int currentAreaId)
     {

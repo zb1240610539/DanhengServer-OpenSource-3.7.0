@@ -162,41 +162,58 @@ public class DropManager(PlayerInstance player) : BasePlayerManager(player)
     /// <summary>
     /// 模拟宇宙专项：战斗胜利后解锁当前 Group 的门和宝箱
     /// </summary>
-  private async ValueTask UnlockRogueSceneObjects(BattleInstance battle)
+private async ValueTask UnlockRogueSceneObjects(BattleInstance battle)
 {
     var scene = Player.SceneInstance;
     if (scene == null) return;
 
+    // 1. 定义门 ID 列表 (手动同步 RogueEntityLoader 里的定义，避免 CS0103)
+    List<int> rogueDoorPropIds = [1000, 1021, 1022, 1023];
+
+    // 2. 尝试按 Group 匹配
     var monsterGroups = battle.EntityMonsters.Select(m => m.GroupId).Distinct().ToList();
     var relatedProps = scene.Entities.Values
         .OfType<EntityProp>()
         .Where(p => monsterGroups.Contains(p.GroupId))
         .ToList();
 
+    // 检查是否通过 Group 找到了门
+    bool foundDoor = relatedProps.Any(p => p.Excel.PropType == PropTypeEnum.PROP_ROGUE_DOOR || rogueDoorPropIds.Contains(p.Excel.ID));
+
+    // 3. 【核心兜底】：如果 Group 没对上（随机房间或多波次怪），直接全场景搜门
+    if (!foundDoor)
+    {
+        Console.WriteLine("[Rogue-Fix] 按 Group 匹配失败，执行全场景门解锁兜底...");
+        var allDoors = scene.Entities.Values
+            .OfType<EntityProp>()
+            .Where(p => p.Excel.PropType == PropTypeEnum.PROP_ROGUE_DOOR || rogueDoorPropIds.Contains(p.Excel.ID))
+            .ToList();
+        
+        relatedProps.AddRange(allDoors);
+    }
+
     if (relatedProps.Count == 0) return;
 
     foreach (var prop in relatedProps)
     {
-        // 【关键打印】：打印 ID、类型枚举和当前状态
-        Console.WriteLine($"[Rogue-Debug] 检测到同组物件: ID={prop.Excel.ID}, Type={prop.Excel.PropType}, State={prop.State}, Name={prop.PropInfo.Name}");
-
-        // 处理传送门
-        if (prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_DOOR)
+        // 解锁传送门
+        if (prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_DOOR || rogueDoorPropIds.Contains(prop.Excel.ID))
         {
-            if (prop.State == PropStateEnum.CheckPointDisable)
+            if (prop.State != PropStateEnum.Open)
             {
-                Console.WriteLine($"[Rogue-Unlock] 战斗胜利，解锁传送门: {prop.EntityId}");
-                await prop.SetState(PropStateEnum.CheckPointEnable);
+                Console.WriteLine($"[Rogue-Unlock] 成功解锁传送门: {prop.EntityId} (ExcelID: {prop.Excel.ID})");
+                await prop.SetState(PropStateEnum.Open);
+                
             }
         }
-        // 修改这里的判断逻辑，把可能的类型都打印出来并尝试解锁
+        // 解锁沉浸奖励/宝箱
         else if (prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_CHEST || 
                  prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_OBJECT || 
                  prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_REWARD_OBJECT)
         {
-            if (prop.State == PropStateEnum.ChestLocked || prop.State == PropStateEnum.Locked)
+            if (prop.State == PropStateEnum.ChestLocked || prop.State == PropStateEnum.Locked || prop.State == PropStateEnum.WaitActive)
             {
-                Console.WriteLine($"[Rogue-Unlock] 战斗胜利，解锁奖励物件/沉浸器: {prop.EntityId} (Type: {prop.Excel.PropType})");
+                Console.WriteLine($"[Rogue-Unlock] 解锁奖励物件: {prop.EntityId}");
                 await prop.SetState(PropStateEnum.ChestClosed);
             }
         }
