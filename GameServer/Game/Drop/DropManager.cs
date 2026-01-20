@@ -129,7 +129,7 @@ public class DropManager(PlayerInstance player) : BasePlayerManager(player)
     // --- 以下保持原样 ---
 
     private async ValueTask HandleRaidSettlement(BattleInstance battle, PVEBattleResultCsReq req)
-{)
+
     {
         if (battle.MappingInfoId <= 0) return;
         // 提取副本波次：req.StageNum 对应玩家选的挑战次数（1-6次）
