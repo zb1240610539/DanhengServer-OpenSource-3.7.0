@@ -15,7 +15,7 @@ using EggLink.DanhengServer.Util;
 using LineupInfo = EggLink.DanhengServer.Database.Lineup.LineupInfo;
 
 namespace EggLink.DanhengServer.GameServer.Game.Battle;
-public delegate ValueTask OnMonsterKillDelegate(EntityMonster monster);
+
 public class BattleInstance(PlayerInstance player, LineupInfo lineup, List<StageConfigExcel> stages)
     : BasePlayerManager(player)
 {
@@ -57,16 +57,9 @@ public class BattleInstance(PlayerInstance player, LineupInfo lineup, List<Stage
             StageId = Stages[0].StageID;
         }
     }
-	 // --- 必须添加这两行 ---
-    public event OnMonsterKillDelegate? OnMonsterKill;
+	 
 
-    public async ValueTask TriggerMonsterKill(EntityMonster monster) 
-    {
-        if (OnMonsterKill != null) 
-        {
-            await OnMonsterKill.Invoke(monster);
-        }
-    }
+   
     public int BattleId { get; set; } = ++player.NextBattleId;
     public int StaminaCost { get; set; }
     public int WorldLevel { get; set; }
