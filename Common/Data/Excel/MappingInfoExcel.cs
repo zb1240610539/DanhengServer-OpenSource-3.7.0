@@ -170,15 +170,21 @@ public class MappingInfoExcel : ExcelResource
             }
         }
 
-        // 处理装备 (光锥) 掉落
         if (equipDrop.Count > 0)
-        {
-            foreach (var dropId in equipDrop)
-            {
-                MappingInfoItem d = new(dropId, 1) { Chance = WorldLevel * 10 + 40 };
-                DropItemList.Add(d);
-            }
-        }
+		{
+    foreach (var dropId in equipDrop)
+    {
+        // 官服逻辑：均衡等级越高，掉狗粮的概率稍微提升一点
+        // WL0: 15% | WL3: 21% | WL6: 27%
+        int lcChance = 15 + (WorldLevel * 2); 
+
+        MappingInfoItem d = new(dropId, 1) 
+        { 
+        Chance = lcChance 
+        };
+        DropItemList.Add(d);
+    }
+		}
 
         // 处理遗器具体掉落数量
         if (relicDrop.Count > 0)
