@@ -131,8 +131,20 @@ public class DropManager(PlayerInstance player) : BasePlayerManager(player)
     private async ValueTask HandleRaidSettlement(BattleInstance battle)
     {
         if (battle.MappingInfoId <= 0) return;
-        var items = await Player.InventoryManager!.HandleMappingInfo(battle.MappingInfoId, battle.WorldLevel);
-        battle.RaidRewardItems.AddRange(items);
+        // 提取副本波次：req.StageNum 对应玩家选的挑战次数（1-6次）
+    	int waveCount = (int)req.StageNum;
+    	if (waveCount <= 0) waveCount = 1; // 兜底
+
+    	// 调用你刚才改好的 HandleMappingInfo，把 waveCount 传进去
+    	var items = await Player.InventoryManager!.HandleMappingInfo(
+        battle.MappingInfoId, 
+        battle.WorldLevel, 
+        waveCount  // <--- 关键：传给你的带 for 循环的逻辑
+    );
+
+    battle.RaidRewardItems.AddRange(items);
+    
+    Console.WriteLine($"[Drop-Raid] 副本结算完成: MappingID {battle.MappingInfoId}, 波次 {waveCount}, 掉落总数 {items.Count}");
     }
 
     private async ValueTask HandleRogueSettlement(BattleInstance battle)
