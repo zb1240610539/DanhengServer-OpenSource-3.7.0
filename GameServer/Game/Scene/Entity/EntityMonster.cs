@@ -162,10 +162,7 @@ public class EntityMonster(
     // --- 核心：只负责发射信号 ---
     // 只要是在战斗中，就告诉战斗实例：“我死了”。
     // 至于收到信号的是大世界插件还是肉鸽插件，怪物完全不关心。
-    if (Scene.Player.BattleInstance != null)
-    {
-        await Scene.Player.BattleInstance.TriggerMonsterKill(this);
-    }
+    
 	
     // 任务计数和清理
     await Scene.Player.MissionManager!.HandleFinishType(MissionFinishTypeEnum.KillMonster, this);
