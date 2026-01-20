@@ -490,83 +490,80 @@ public class InventoryManager(PlayerInstance player) : BasePlayerManager(player)
     /// 处理副本/花萼结算（解决6波掉落固定与里程显示总数问题）
     /// </summary>
    public async ValueTask<List<ItemData>> HandleMappingInfo(int mappingId, int worldLevel, int wave = 1)
-    {
-        // ============= 增加调试打印 =============
-        int searchKey = mappingId * 10 + worldLevel;
-        Console.WriteLine("\n[DEBUG-MAPPING] =========================================");
-        Console.WriteLine($"[DEBUG-MAPPING] 收到结算请求 -> 副本ID: {mappingId}, 均衡等级: {worldLevel}, 波次: {wave}");
-        Console.WriteLine($"[DEBUG-MAPPING] 检索字典 Key -> {searchKey}");
-        // =======================================
-
-        List<ItemData> resItems = []; 
-        
-        // 1. 获取 Mapping 配置
-        GameData.MappingInfoData.TryGetValue(searchKey, out var mapping);
-        
-        if (mapping == null) 
-        {
-            Console.WriteLine($"[DEBUG-MAPPING] !!! 致命错误: 找不到该 ID 的配置 !!!");
-            Console.WriteLine("=========================================================\n");
-            return [];
-        }
-
-        // ============= 打印内存里的真实数据 =============
-        Console.WriteLine($"[DEBUG-MAPPING] 内存匹配成功 -> 当前副本映射名Hash: {mapping.ID}");
-        Console.WriteLine($"[DEBUG-MAPPING] 该配置下的 DropItemList 包含以下物品:");
-        foreach (var d in mapping.DropItemList)
-        {
-            Console.WriteLine($"   - 物品ID: {d.ItemID} (名称参考: 110406=虚幻铸铁, 183002=相位灵火)");
-        }
-        Console.WriteLine("=========================================================\n");
-        // ===============================================
-		// 2. 开始波次大循环 (独立判定核心)
-for (int i = 0; i < wave; i++)
 {
-    // --- A. 普通道具独立抽取 ---
-    foreach (var item in mapping.DropItemList)
-    {
-        // 每一波都重新 Roll 一次概率 (真正的独立判定)
-        if (Random.Shared.Next(0, 101) <= item.Chance)
-        {
-            // 每一波的基础数量也是独立随机的
-            var amount = item.ItemNum > 0 ? item.ItemNum : Random.Shared.Next(item.MinCount, item.MaxCount + 1);
-            
-            // 全局倍率依然生效 (例如双倍掉落活动)
-            var multiplier = (item.ItemID == 22 || item.ItemID == 2) ? 1 : ConfigManager.Config.ServerOption.ValidFarmingDropRate();
-            
-            var currentWaveCount = amount * multiplier;
+    // ============= 增加调试打印 =============
+    int searchKey = mappingId * 10 + worldLevel;
+    Console.WriteLine("\n[DEBUG-MAPPING] =========================================");
+    Console.WriteLine($"[DEBUG-MAPPING] 收到结算请求 -> 副本ID: {mappingId}, 均衡等级: {worldLevel}, 波次: {wave}");
+    Console.WriteLine($"[DEBUG-MAPPING] 检索字典 Key -> {searchKey}");
 
-            // 记录到临时列表，稍后统一合并或直接添加
-            // 注意：这里我们先存起来，最后再统一 AddItem 效率更高
-            totalCountMap[item.ItemID] = totalCountMap.GetValueOrDefault(item.ItemID) + currentWaveCount;
+    List<ItemData> resItems = []; 
+    
+    // 1. 获取 Mapping 配置
+    GameData.MappingInfoData.TryGetValue(searchKey, out var mapping);
+    
+    if (mapping == null) 
+    {
+        Console.WriteLine($"[DEBUG-MAPPING] !!! 致命错误: 找不到该 ID 的配置 !!!");
+        Console.WriteLine("=========================================================\n");
+        return [];
+    }
+
+    Console.WriteLine($"[DEBUG-MAPPING] 内存匹配成功 -> 当前副本映射名Hash: {mapping.ID}");
+    Console.WriteLine($"[DEBUG-MAPPING] 该配置下的 DropItemList 包含以下物品:");
+    foreach (var d in mapping.DropItemList)
+    {
+        Console.WriteLine($"   - 物品ID: {d.ItemID} (机会: {d.Chance}%)");
+    }
+    Console.WriteLine("=========================================================\n");
+
+    // ===============================================
+    // 【修复点 1】: 定义累加字典
+    Dictionary<int, long> totalCountMap = [];
+
+    // 2. 开始波次大循环 (独立判定核心)
+    for (int i = 0; i < wave; i++)
+    {
+        // --- A. 普通道具独立抽取 ---
+        foreach (var item in mapping.DropItemList)
+        {
+            // 每一波都重新 Roll 一次概率
+            if (Random.Shared.Next(0, 101) <= item.Chance)
+            {
+                var amount = item.ItemNum > 0 ? item.ItemNum : Random.Shared.Next(item.MinCount, item.MaxCount + 1);
+                var multiplier = (item.ItemID == 22 || item.ItemID == 2) ? 1 : ConfigManager.Config.ServerOption.ValidFarmingDropRate();
+                
+                long currentWaveCount = (long)amount * multiplier;
+
+                // 累加数量
+                totalCountMap[item.ItemID] = totalCountMap.GetValueOrDefault(item.ItemID) + currentWaveCount;
+            }
+        }
+
+        // --- B. 遗器独立抽取 ---
+        var relicDrops = mapping.GenerateRelicDrops();
+        foreach (var relic in relicDrops)
+        {
+            var dbRelic = await AddItem(relic.ItemId, 1, notify: false, sync: false, returnRaw: true);
+            if (dbRelic != null) resItems.Add(dbRelic);
+        }
+    } // 【修复点 2】: 闭合波次大循环
+
+    // 3. 最后统一结算普通道具 (减少数据库写入压力)
+    foreach (var kvp in totalCountMap)
+    {
+        var dbItem = await AddItem(kvp.Key, kvp.Value, notify: false, sync: false, returnRaw: true);
+        if (dbItem != null)
+        {
+            var displayItem = dbItem.Clone();
+            displayItem.Count = (int)kvp.Value; // 赋值给具体的显示对象
+            resItems.Add(displayItem);
         }
     }
 
-    // --- B. 遗器独立抽取 (你原来的逻辑已经很棒了) ---
-    var relicDrops = mapping.GenerateRelicDrops();
-    foreach (var relic in relicDrops)
-    {
-        // 遗器必须立即 AddItem，因为每个都要生成唯一 UID
-        var dbRelic = await AddItem(relic.ItemId, 1, notify: false, sync: false, returnRaw: true);
-        if (dbRelic != null) resItems.Add(dbRelic);
-    }
+    // 【修复点 3】: 确保方法最后有返回值
+    return resItems; 
 }
-
-	// 3. 最后统一结算普通道具 (减少数据库写入压力)
-	foreach (var kvp in totalCountMap)
-	{
-    var dbItem = await AddItem(kvp.Key, kvp.Value, notify: false, sync: false, returnRaw: true);
-    if (dbItem != null)
-    {
-        var displayItem = dbItem.Clone();
-        displayItem.Count = kvp.Value; 
-        resItems.Add(displayItem);
-    }
-      
-
-        return resItems; 
-    }
-    }
 	   
 
     public async ValueTask<(int, ItemData?)> HandleRelic(
