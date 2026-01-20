@@ -88,7 +88,43 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
     #endregion
 
     #region Actions
+  // =========================================================================
+    // 【新增辅助方法 1】读取已通关列表
+    // 作用：把数据库里的 "110,120,130" 字符串变成集合，方便快速检查
+    // =========================================================================
+    private HashSet<int> GetClearedAreaIds()
+    {
+        // 读取 PlayerData 里的新字段
+        if (string.IsNullOrEmpty(Player.Data.RogueFinishedAreaIds)) 
+            return new HashSet<int>();
+            
+        return Player.Data.RogueFinishedAreaIds
+            .Split(',')
+            .Where(s => !string.IsNullOrEmpty(s)) // 防止空字符报错
+            .Select(int.Parse)
+            .ToHashSet();
+    }
 
+    // =========================================================================
+    // 【新增辅助方法 2】保存通关记录
+    // 作用：通关后把 ID 加进去，转成字符串存回数据库
+    // =========================================================================
+    private void SaveClearedAreaId(int areaId)
+    {
+        var clearedSet = GetClearedAreaIds();
+        
+        // 如果已经存过了，就不用再存了
+        if (clearedSet.Contains(areaId)) return; 
+
+        // 加入集合
+        clearedSet.Add(areaId);
+        
+        // 转回字符串存入 Player.Data
+        Player.Data.RogueFinishedAreaIds = string.Join(",", clearedSet);
+        
+        // 标记保存到数据库 (这一步很重要，否则重启服务器记录就丢了)
+        DatabaseHelper.ToSaveUidList.SafeAdd(Player.Uid);
+    }
   // --- 【修改 StartRogue 方法】 ---
     public async ValueTask StartRogue(int areaId, int aeonId, List<int> disableAeonId, List<int> baseAvatarIds)
     {	Console.WriteLine($"[RogueDebug] 客户端请求进入: AreaId={areaId}, AeonId={aeonId}");
@@ -114,47 +150,46 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
         await Player.SendPacket(new PacketSyncRogueStatusScNotify(RogueInstance.Status));
         await Player.SendPacket(new PacketStartRogueScRsp(Player));
     }
-    // --- 【修改结束】 ---
-	// =========================================================================
-    // 【新增】通关结算：发奖励 + 解锁下一关 + 保存数据库
+   
+    
+
     // =========================================================================
-   // --- 【修改 FinishRogue 方法】 ---
-	// =========================================================================
-// 【修改后】通关发奖：返回物品列表供结算大屏展示
-// =========================================================================
-// =========================================================================
-    // 【核心修正】FinishRogue: 使用进度值判断是否首通，不占用积分字段
-    // =========================================================================
-   // =========================================================================
-    // 【核心逻辑】FinishRogue: 进度检查 + 难度获取 + 权重掉落
+    // 【新增辅助方法】下面全是新加的，建议放在 FinishRogue 下面
     // =========================================================================
     // =========================================================================
-    // 【修复版】FinishRogue: 修复 uint -> int 类型转换错误
+    // 【修改后的 FinishRogue】
+    // 逻辑：通关结算 -> 检查是否首通 -> 发奖 -> 记录通关ID
     // =========================================================================
     public async ValueTask<List<ItemData>> FinishRogue(int currentAreaId, bool isWin)
     {
         List<ItemData> totalRewards = new();
+        
+        // 1. 如果没打赢，直接返回空
         if (!isWin) return totalRewards;
 
-        // 1. 进度检查
-        if (currentAreaId < Player.Data.RogueUnlockProgress)
+        // 获取已通关列表
+        var clearedSet = GetClearedAreaIds();
+
+        // 2. 检查首通状态
+        // 如果列表里已经有这个 ID，说明以前通过关，领过首通奖了 -> 跳过奖励
+        if (clearedSet.Contains(currentAreaId))
         {
-            Console.WriteLine($"[RogueManager] AreaId: {currentAreaId} 已首通(进度:{Player.Data.RogueUnlockProgress})，本次无奖励。");
+            Console.WriteLine($"[RogueManager] AreaId: {currentAreaId} 已在通关记录中，本次无首通奖励。");
             return totalRewards; 
         }
 
-        Console.WriteLine($"[RogueManager] 首次通关 AreaId: {currentAreaId}，准备计算奖励...");
+        Console.WriteLine($"[RogueManager] 首次通关 AreaId: {currentAreaId}，准备发放首通奖励...");
 
         if (GameData.RogueAreaConfigData.TryGetValue(currentAreaId, out var areaConfig))
         {
-            // 获取难度
+            // 获取难度 (防错处理)
             int difficulty = areaConfig.Difficulty; 
             if (difficulty == 0) difficulty = 1;
 
-            // 2. 奖励分流
+            // --- 奖励分流逻辑 (这部分和你之前的一样) ---
             if (currentAreaId < 130)
             {
-                // [世界1、2] 读取 Excel
+                // [世界1、2] 读取 Excel 固定奖励
                 int firstRewardId = areaConfig.FirstReward;
                 if (firstRewardId > 0)
                 {
@@ -164,14 +199,13 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
             }
             else
             {
-                // [世界3及以后] 权重随机
+                // [世界3及以后] 权重随机奖励
                 int worldIndex = (currentAreaId - 100) / 10; 
-                
                 var relicRewards = GenerateWorldRelicRewards(worldIndex, difficulty);
                 
                 foreach (var item in relicRewards)
                 {
-                    // 【核心修复】这里加了 (int) 强制转换
+                    // 注意这里用了 (int) 强转防止报错
                     var reward = await Player.InventoryManager!.AddItem(item.ItemId, (int)item.Count, notify: true, sync: true);
                     
                     if (reward != null) totalRewards.Add(reward);
@@ -179,23 +213,14 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
                 Console.WriteLine($"[Rogue] 世界{worldIndex} (难度{difficulty}) 权重奖励发放完成，共 {totalRewards.Count} 个物品");
             }
 
-            // 3. 更新进度
-            if (currentAreaId >= Player.Data.RogueUnlockProgress)
-            {
-                Player.Data.RogueUnlockProgress = currentAreaId + 10;
-                Console.WriteLine($"[RogueManager] 进度解锁更新至: {Player.Data.RogueUnlockProgress}");
-                DatabaseHelper.ToSaveUidList.SafeAdd(Player.Uid);
-            }
+            // 3. 【核心修改】保存进度
+            // 发完奖后，把这个 ID 存入数据库，下次就不发了
+            SaveClearedAreaId(currentAreaId);
         }
 
         await System.Threading.Tasks.Task.CompletedTask;
         return totalRewards; 
     }
-
-    // =========================================================================
-    // 【新增辅助方法】下面全是新加的，建议放在 FinishRogue 下面
-    // =========================================================================
-
     // 1. 主生成逻辑
     private List<ItemData> GenerateWorldRelicRewards(int worldIndex, int difficulty)
     {
@@ -277,23 +302,15 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
         };
     }
 	// --- 【新增 UpdateRogueProgress 方法】 ---
-public async ValueTask UpdateRogueProgress(int currentAreaId)
-{
-    Console.WriteLine($"[RogueManager] 玩家手动退出，正在更新关卡进度并保存数据库...");
-
-    // 1. 解锁下一关逻辑
-    // 如果当前打通的关卡 >= 记录的进度，说明是推图成功，进度 +10
-    if (currentAreaId >= Player.Data.RogueUnlockProgress)
+	public async ValueTask UpdateRogueProgress(int currentAreaId)
     {
-        Player.Data.RogueUnlockProgress = currentAreaId + 10;
-        Console.WriteLine($"[RogueManager] 进度已更新! 当前最高解锁: {Player.Data.RogueUnlockProgress}");
-    }
+        Console.WriteLine($"[RogueManager] 玩家手动退出，正在检查通关记录...");
 
-    // 2. 触发数据库保存
-    // 这样保证了奖励可以无限刷（因为不存奖励领取状态），但进度解锁是永久保存的
-    DatabaseHelper.ToSaveUidList.SafeAdd(Player.Uid);
-	await System.Threading.Tasks.Task.CompletedTask;
-}
+        // 直接调用保存逻辑，内部会自动判断是否重复，不会覆盖旧数据
+        SaveClearedAreaId(currentAreaId);
+        
+        await System.Threading.Tasks.Task.CompletedTask;
+    }
    private static readonly Dictionary<int, int[]> WorldToRelicSets = new()
     {
         { 1, [01, 02] }, // 世界3: 空间站(01), 仙舟(02)
