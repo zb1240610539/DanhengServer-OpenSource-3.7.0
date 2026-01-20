@@ -103,54 +103,64 @@ public class MappingInfoExcel : ExcelResource
             else if (excel.ItemMainType == ItemMainTypeEnum.Material)
             {
                 MappingInfoItem? drop;
-                switch (excel.PurposeType)
-                {
-                    case 1: // 角色经验
-                        var amount = excel.Rarity switch
-                        {
-                            ItemRarityEnum.NotNormal => WorldLevel < 3 ? WorldLevel + 3 : 2.5,
-                            ItemRarityEnum.Rare => WorldLevel < 3 ? WorldLevel + 3 : WorldLevel * 2 - 3,
-                            _ => 1
-                        };
-                        drop = new MappingInfoItem(excel.ID, (int)amount);
-                        break;
+               switch (excel.PurposeType)
+	{
+    case 1: // 角色经验 (书)
+        // 官服逻辑：经验书通常是必掉的，但数量随等级提升
+        var expAmount = excel.Rarity switch
+        {
+            ItemRarityEnum.NotNormal => WorldLevel < 3 ? 3 : 4, // 蓝色
+            ItemRarityEnum.Rare => WorldLevel < 3 ? 0 : WorldLevel - 2, // 紫色
+            _ => 1
+        };
+        drop = new MappingInfoItem(excel.ID, (int)expAmount) { Chance = 100 };
+        break;
 
-                    case 2: // 【关键修复点】：晋阶材料 (虚幻铸铁等)
-                        // 修正掉落公式：底数 2 + 均衡等级加成。彻底解决 WorldLevel 0 时掉落 0 的 BUG
-                        int finalCount = Math.Max(2, WorldLevel + 2); 
-                        drop = new MappingInfoItem(excel.ID, finalCount)
-                        {
-                            MinCount = finalCount,
-                            MaxCount = (WorldLevel >= 3) ? finalCount + 1 : finalCount
-                        };
-                        break;
+    case 2: // 晋阶材料 (大世界BOSS/虚幻铸铁等)
+        // 官服逻辑：必掉，数量 2-3 或 4-5
+        int bossCount = WorldLevel >= 4 ? 5 : (WorldLevel >= 2 ? 3 : 2);
+        drop = new MappingInfoItem(excel.ID, bossCount)
+        {
+            Chance = 100, 
+            MinCount = bossCount,
+            MaxCount = (WorldLevel >= 3) ? bossCount + 1 : bossCount
+        };
+        break;
 
-                    case 3: // 行迹材料
-                        drop = new MappingInfoItem(excel.ID, 5);
-                        break;
+    case 3: // 行迹材料 (花萼赤)
+        // 【核心随机点】官服最典型的随机：绿必掉，蓝高概率，紫低概率
+        int traceChance = excel.Rarity switch
+        {
+            ItemRarityEnum.Normal => 100,                     // 绿色：100%
+            ItemRarityEnum.NotNormal => 30 + (WorldLevel * 10), // 蓝色：WL3(60%) -> WL6(90%)
+            ItemRarityEnum.Rare => 5 + (WorldLevel * 4),      // 紫色：WL3(17%) -> WL6(29%)
+            _ => 100
+        };
+        drop = new MappingInfoItem(excel.ID, 1) { Chance = traceChance };
+        break;
 
-                    case 4: // 周本材料
-                        drop = new MappingInfoItem(excel.ID, (int)(WorldLevel * 0.5 + 0.5));
-                        break;
+    case 5: // 光锥经验 (提纯以太)
+        // 数量略有随机
+        var lcExpCount = excel.Rarity switch
+        {
+            ItemRarityEnum.NotNormal => 3,
+            ItemRarityEnum.Rare => WorldLevel >= 3 ? 1 : 0,
+            _ => 2
+        };
+        drop = new MappingInfoItem(excel.ID, (int)lcExpCount) 
+        { 
+            Chance = (excel.Rarity == ItemRarityEnum.Rare) ? (WorldLevel * 15) : 100 
+        };
+        break;
 
-                    case 5: // 光锥经验
-                        var count = excel.Rarity switch
-                        {
-                            ItemRarityEnum.NotNormal => Math.Max(5 - WorldLevel, 2.5),
-                            ItemRarityEnum.Rare => WorldLevel % 3 + 1,
-                            _ => 1
-                        };
-                        drop = new MappingInfoItem(excel.ID, (int)count);
-                        break;
+    case 11: // 遗器合成材料 (残骸)
+        drop = new MappingInfoItem(excel.ID, 10) { Chance = 100 };
+        break;
 
-                    case 11: // 遗器合成材料
-                        drop = new MappingInfoItem(excel.ID, 4 + WorldLevel);
-                        break;
-
-                    default:
-                        drop = null;
-                        break;
-                }
+    default:
+        drop = new MappingInfoItem(excel.ID, 1) { Chance = 100 };
+        break;
+	}
 
                 if (drop != null) DropItemList.Add(drop);
             }
