@@ -96,46 +96,7 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
     // 【修改后的 GetClearedAreaIds】(带自动初始化功能)
     // 逻辑：读取列表 -> 如果发现缺了 100/110 -> 补全并存库 -> 返回列表
     // =========================================================================
-    private HashSet<int> GetClearedAreaIds()
-    {
-        // 1. 解析现有数据
-        HashSet<int> set;
-        if (string.IsNullOrEmpty(Player.Data.RogueFinishedAreaIds))
-        {
-            set = new HashSet<int>();
-        }
-        else
-        {
-            set = Player.Data.RogueFinishedAreaIds
-                .Split(',')
-                .Where(s => !string.IsNullOrEmpty(s))
-                .Select(int.Parse)
-                .ToHashSet();
-        }
-
-        // 2. 【核心逻辑】检查并注入默认通关记录 (100, 110)
-        // HashSet.Add() 返回 true 表示该元素原先不存在，被成功添加了
-        bool isChanged = false;
-
-        // 强制添加 100 (教学关/前置)
-        if (set.Add(100)) isChanged = true;
-        
-        // 强制添加 110 (第一世界)
-        if (set.Add(110)) isChanged = true;
-
-        // 3. 如果发生了变动 (说明是新号或者数据不全)，立即保存回数据库
-        if (isChanged)
-        {
-            Console.WriteLine("[RogueManager] 检测到缺失初始关卡记录，已自动补全 100, 110 并保存。");
-            
-            Player.Data.RogueFinishedAreaIds = string.Join(",", set);
-            
-            // 触发数据库保存
-            DatabaseHelper.ToSaveUidList.SafeAdd(Player.Uid);
-        }
-
-        return set;
-    }
+   
     // =========================================================================
     // 【新增辅助方法 2】保存通关记录
     // 作用：通关后把 ID 加进去，转成字符串存回数据库
@@ -154,6 +115,22 @@ public class RogueManager(PlayerInstance player) : BasePlayerManager(player)
             .Where(s => !string.IsNullOrEmpty(s))
             .Select(int.Parse)
             .ToHashSet();
+    }
+	private void SaveClearedAreaId(int areaId)
+    {
+        var clearedSet = GetClearedAreaIds();
+        
+        // 如果已经存过了，就不用再存了
+        if (clearedSet.Contains(areaId)) return; 
+
+        // 加入集合
+        clearedSet.Add(areaId);
+        
+        // 转回字符串存入 Player.Data
+        Player.Data.RogueFinishedAreaIds = string.Join(",", clearedSet);
+        
+        // 标记保存到数据库 (这一步很重要，否则重启服务器记录就丢了)
+        DatabaseHelper.ToSaveUidList.SafeAdd(Player.Uid);
     }
   // --- 【修改 StartRogue 方法】 ---
     public async ValueTask StartRogue(int areaId, int aeonId, List<int> disableAeonId, List<int> baseAvatarIds)
