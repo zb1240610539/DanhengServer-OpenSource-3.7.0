@@ -549,22 +549,30 @@ public class InventoryManager(PlayerInstance player) : BasePlayerManager(player)
         }
     } // 【修复点 2】: 闭合波次大循环
 
-    // 3. 最后统一结算普通道具 (减少数据库写入压力)
-    foreach (var kvp in totalCountMap)
-    {
-        var dbItem = await AddItem(kvp.Key, kvp.Value, notify: false, sync: false, returnRaw: true);
-        if (dbItem != null)
-        {
-            var displayItem = dbItem.Clone();
-            displayItem.Count = (int)kvp.Value; // 赋值给具体的显示对象
-            resItems.Add(displayItem);
-        }
-    }
+    // 3. 最后统一结算普通道具 (合并多波次后的总量)
+foreach (var kvp in totalCountMap)
+{
+    int itemId = kvp.Key;
+    long finalAmount = kvp.Value;
 
-    // 【修复点 3】: 确保方法最后有返回值
-    return resItems; 
+    // 修复 CS1503: 将 long 显式转换为 int 传给 AddItem
+    var dbItem = await AddItem(itemId, (int)finalAmount, notify: false, sync: false, returnRaw: true);
+    
+    if (dbItem != null)
+    {
+        // 修复 CS0200 & CS1503: 
+        // 1. 克隆对象用于 UI 显示
+        var displayItem = dbItem.Clone();
+        // 2. 这里的 Count 是 ItemData 的成员变量，可以赋值
+        displayItem.Count = (int)finalAmount; 
+        // 3. 将单个对象加入列表，而不是加入整个集合
+        resItems.Add(displayItem);
+    }
 }
-	   
+
+// 别忘了最后返回列表
+return resItems;
+}	   
 
     public async ValueTask<(int, ItemData?)> HandleRelic(
         int relicId, int uniqueId, int level, int mainAffixId = 0, List<(int, int)>? subAffixes = null)
