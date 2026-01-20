@@ -146,44 +146,46 @@ public class DropManager(PlayerInstance player) : BasePlayerManager(player)
     /// <summary>
     /// 模拟宇宙专项：战斗胜利后解锁当前 Group 的门和宝箱
     /// </summary>
-    private async ValueTask UnlockRogueSceneObjects(BattleInstance battle)
+  private async ValueTask UnlockRogueSceneObjects(BattleInstance battle)
+{
+    var scene = Player.SceneInstance;
+    if (scene == null) return;
+
+    var monsterGroups = battle.EntityMonsters.Select(m => m.GroupId).Distinct().ToList();
+    var relatedProps = scene.Entities.Values
+        .OfType<EntityProp>()
+        .Where(p => monsterGroups.Contains(p.GroupId))
+        .ToList();
+
+    if (relatedProps.Count == 0) return;
+
+    foreach (var prop in relatedProps)
     {
-        var scene = Player.SceneInstance;
-        if (scene == null) return;
+        // 【关键打印】：打印 ID、类型枚举和当前状态
+        Console.WriteLine($"[Rogue-Debug] 检测到同组物件: ID={prop.Excel.ID}, Type={prop.Excel.PropType}, State={prop.State}, Name={prop.PropInfo.Name}");
 
-        // 获取当前战斗中所有怪物的 GroupId（通常只有一个）
-        var monsterGroups = battle.EntityMonsters.Select(m => m.GroupId).Distinct().ToList();
-
-        // 找到同组的所有物件
-        var relatedProps = scene.Entities.Values
-            .OfType<EntityProp>()
-            .Where(p => monsterGroups.Contains(p.GroupId))
-            .ToList();
-
-        if (relatedProps.Count == 0) return;
-
-        foreach (var prop in relatedProps)
+        // 处理传送门
+        if (prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_DOOR)
         {
-            // 处理传送门：从 CheckPointDisable(7) 变为 CheckPointEnable(8)
-            if (prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_DOOR)
+            if (prop.State == PropStateEnum.CheckPointDisable)
             {
-                if (prop.State == PropStateEnum.CheckPointDisable)
-                {
-                    Console.WriteLine($"[Rogue-Drop] 战斗胜利，解锁传送门: 实体ID {prop.EntityId}");
-                    await prop.SetState(PropStateEnum.CheckPointEnable);
-                }
+                Console.WriteLine($"[Rogue-Unlock] 战斗胜利，解锁传送门: {prop.EntityId}");
+                await prop.SetState(PropStateEnum.CheckPointEnable);
             }
-            // 处理肉鸽宝箱：从 ChestLocked(11) 变为 ChestClosed(12)
-            else if (prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_CHEST)
+        }
+        // 修改这里的判断逻辑，把可能的类型都打印出来并尝试解锁
+        else if (prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_CHEST || 
+                 prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_OBJECT || 
+                 prop.Excel.PropType == PropTypeEnum.PROP_ROGUE_REWARD_OBJECT)
+        {
+            if (prop.State == PropStateEnum.ChestLocked || prop.State == PropStateEnum.Locked)
             {
-                if (prop.State == PropStateEnum.ChestLocked)
-                {
-                    Console.WriteLine($"[Rogue-Drop] 战斗胜利，解锁宝箱封印: 实体ID {prop.EntityId}");
-                    await prop.SetState(PropStateEnum.ChestClosed);
-                }
+                Console.WriteLine($"[Rogue-Unlock] 战斗胜利，解锁奖励物件/沉浸器: {prop.EntityId} (Type: {prop.Excel.PropType})");
+                await prop.SetState(PropStateEnum.ChestClosed);
             }
         }
     }
+}
     private async ValueTask HandleCollegeSettlement(BattleInstance battle)
     {
         var excel = battle.CollegeConfigExcel!;
