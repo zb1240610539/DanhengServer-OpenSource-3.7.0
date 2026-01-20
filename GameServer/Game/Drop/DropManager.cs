@@ -133,18 +133,13 @@ public class DropManager(PlayerInstance player) : BasePlayerManager(player)
     {
         if (battle.MappingInfoId <= 0) return;
         // 提取副本波次：req.StageNum 对应玩家选的挑战次数（1-6次）
-    	if (battle.CocoonWave > 0) 
-    {
-        waveCount = battle.CocoonWave;
-        Console.WriteLine($"[Drop-Raid] 检测到连打副本，倍率: {waveCount}");
-    }
-    // 2. 判断是否为“调试/单场模式” (比如你说的晋阶材料BOSS)
-    else 
-    {
-        // 如果 battle.CocoonWave 是 0，说明走的是调试分支或者非连打分支
-        // 此时我们维持 waveCount = 1，保证它只出一倍掉落
-        Console.WriteLine($"[Drop-Raid] 检测到单场/调试副本，维持 1 倍掉落");
-    }
+   	// --- 修复关键：先定义变量，再使用 ---
+    // 优先读取你存在实例里的波次，如果是 0 则视为 1 倍（单场模式）
+    int waveCount = battle.CocoonWave > 0 ? battle.CocoonWave : 1;
+
+    // --- 2. 使用 waveCount ---
+    Console.WriteLine($"[Drop-Raid] 副本结算中，倍率: {waveCount}");	
+    
 
     // 3. 调用掉落引擎
     var items = await Player.InventoryManager!.HandleMappingInfo(
