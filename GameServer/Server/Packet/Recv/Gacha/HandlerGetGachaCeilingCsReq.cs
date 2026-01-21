@@ -21,10 +21,9 @@ public class HandlerGetGachaCeilingCsReq : Handler
             GachaCeiling = new GachaCeiling
             {
                 // CeilingNum: 玩家当前的累计抽数（例如 150/300）
-                CeilingNum = (uint)player.GachaManager.GachaData.StandardCumulativeCount,
-                
+				CeilingNum = (uint)(player.GachaManager?.GachaData?.StandardCumulativeCount ?? 0),                
                 // IsClaimed: 玩家是否已经领取过这 300 抽的自选奖励
-                IsClaimed = player.GachaManager.GachaData.IsStandardSelected,
+                IsClaimed = player.GachaManager?.GachaData?.IsStandardSelected ?? false,
                 
                 // AvatarList: 300 抽可选角色的列表
                 // 通常包含：姬子(1003), 瓦尔特(1004), 布洛妮娅(1101), 杰帕德(1104), 克拉拉(1102), 彦卿(1209), 白露(1211)
