@@ -1,6 +1,7 @@
 using EggLink.DanhengServer.Database.Gacha;
 using EggLink.DanhengServer.Enums;
 using EggLink.DanhengServer.Proto;
+using EggLink.DanhengServer.Util; // 引用全局Debug开关
 using GachaInfo = EggLink.DanhengServer.Proto.GachaInfo;
 using System.IO; 
 using System.Text.Json; 
@@ -28,114 +29,116 @@ public class BannerConfig
     public int MaxCount { get; set; } = 90;
     public int EventChance { get; set; } = 50;
 
-    public int DoGacha(List<int> goldAvatars, List<int> purpleAvatars, List<int> purpleWeapons, List<int> goldWeapons,
-        List<int> blueWeapons, GachaData data, int uid)
+   public int DoGacha(List<int> goldAvatars, List<int> purpleAvatars, List<int> purpleWeapons, List<int> goldWeapons,
+    List<int> blueWeapons, GachaData data, int uid)
+{
+    var random = new Random();
+    
+    // --- 1. 精准获取当前池子的水位标记 ---
+    int pityCount = 0;
+    if (this.GachaId == 4001) pityCount = data.NewbiePityCount;
+    else if (this.GachaId == 1001) pityCount = data.StandardPityCount; // 使用新增的保底标记
+    else pityCount = data.LastGachaFailedCount; // 限定池使用此通用计数
+
+    int currentMaxCount = this.MaxCount;
+    int softPityStart5 = (GachaType == GachaTypeEnum.WeaponUp) ? 62 : 72; 
+
+    // --- 2. 独立计数累加逻辑 ---
+    if (this.GachaId == 4001)
     {
-        var random = new Random();
-        
-        // --- 1. 初始化保底与软保底阈值 ---
-        int currentMaxCount = this.MaxCount;
-        int softPityStart5 = (GachaType == GachaTypeEnum.WeaponUp) ? 62 : 72; // 5星软保底：武器63，其他73
+       
+        currentMaxCount = 50; 
+        softPityStart5 = 40; 
+        data.NewbieGachaCount += 1;
+    }
+    else if (this.GachaId == 1001)
+    {
+        data.StandardCumulativeCount += 1; // 300抽自选进度永远累加
+        data.StandardPityCount += 1;
+		data.NewbiePityCount += 1;		// 常驻池保底水位累加
+    }
+    else
+    {
+        data.LastGachaFailedCount += 1;    // 限定池水位累加
+    }
 
-        if (this.GachaId == 4001)
+    data.LastGachaPurpleFailedCount += 1;
+
+    int item;
+    var allGoldItems = new List<int>();
+    allGoldItems.AddRange(goldAvatars);
+    allGoldItems.AddRange(goldWeapons);
+
+    // --- 3. 五星判定 (基于 pityCount) ---
+    double currentChance5 = GetRateUpItem5Chance / 1000.0; 
+    if (pityCount > softPityStart5)
+    {
+        currentChance5 += 0.06 * (pityCount - softPityStart5);
+    }
+
+    if (random.NextDouble() < currentChance5 || pityCount >= currentMaxCount)
+    {
+        if (GlobalDebug.EnableVerboseLog)
+            Console.WriteLine($"[GACHA_DEBUG] !!!金光闪烁!!! UID:{uid} Banner:{GachaId} 第 {pityCount} 抽触发");
+
+        // --- 4. 独立重置逻辑 ---
+        if (this.GachaId == 1001)
         {
-            if (data.NewbieGachaCount >= 50) return 0; 
-            currentMaxCount = 50; 
-            softPityStart5 = 40; 
-            data.NewbieGachaCount += 1; 
+            data.StandardPityCount = 0; // 仅重置常驻保底，不重置300抽进度
+        }
+        else if (this.GachaId != 4001)
+        {
+            data.NewbiePityCount = 0; // 重置限定池保底
+        }
+		else
+        {
+            data.LastGachaFailedCount = 0;
         }
 
-        if (this.GachaId == 1001) data.StandardCumulativeCount += 1; 
-
-        data.LastGachaFailedCount += 1;
-        data.LastGachaPurpleFailedCount += 1;
-
-        int item;
-
-        // 修复 CS9176：改回显式创建 List
-        var allGoldItems = new List<int>();
-        allGoldItems.AddRange(goldAvatars);
-        allGoldItems.AddRange(goldWeapons);
-
-        // --- 2. 五星判定逻辑 (软保底) ---
-        double currentChance5 = GetRateUpItem5Chance / 1000.0; // 0.006
-        if (data.LastGachaFailedCount > softPityStart5)
+        // 确定获得物品
+        if (GachaType == GachaTypeEnum.WeaponUp)
         {
-            currentChance5 += 0.06 * (data.LastGachaFailedCount - softPityStart5);
+            item = GetRateUpItem5(goldWeapons, data.LastWeaponGachaFailed);
+            data.LastWeaponGachaFailed = !RateUpItems5.Contains(item);
         }
-
-        if (random.NextDouble() < currentChance5 || data.LastGachaFailedCount >= currentMaxCount)
+        else if (GachaType == GachaTypeEnum.AvatarUp)
         {
-            data.LastGachaFailedCount = 0; 
-            
-            if (GachaType == GachaTypeEnum.WeaponUp)
-            {
-                item = GetRateUpItem5(goldWeapons, data.LastWeaponGachaFailed);
-                data.LastWeaponGachaFailed = !RateUpItems5.Contains(item);
-            }
-            else if (GachaType == GachaTypeEnum.AvatarUp)
-            {
-                item = GetRateUpItem5(goldAvatars, data.LastAvatarGachaFailed);
-                data.LastAvatarGachaFailed = !RateUpItems5.Contains(item);
-            }
-            else
-            {
-                item = GetRateUpItem5(allGoldItems, false);
-            }
+            item = GetRateUpItem5(goldAvatars, data.LastAvatarGachaFailed);
+            data.LastAvatarGachaFailed = !RateUpItems5.Contains(item);
         }
-        // --- 3. 四星判定逻辑 (软保底 + 掉落分类) ---
         else
         {
-            double currentChance4 = 0.051; // 基础 5.1%
-            // 官服规律：第 9 抽软保底概率激增
-            if (data.LastGachaPurpleFailedCount >= 9) currentChance4 = 0.51;
+            item = GetRateUpItem5(allGoldItems, false);
+        }
+    }
+    else
+    {
+        // --- 四星及以下判定 ---
+        double currentChance4 = 0.051; 
+        if (data.LastGachaPurpleFailedCount >= 9) currentChance4 = 0.51;
 
-            if (random.NextDouble() < currentChance4 || data.LastGachaPurpleFailedCount >= 10)
-            {
-                data.LastGachaPurpleFailedCount = 0;
-                
-                // 判定是否出 4星 UP
-                bool isUp = random.Next(0, 100) < 50 && RateUpItems4.Count > 0;
-
-                if (isUp)
-                {
-                    item = RateUpItems4[random.Next(0, RateUpItems4.Count)];
-                }
-                else
-                {
-                    // 根据卡池类型决定掉落倾向 (官服区分角色/武器)
-                    if (GachaType == GachaTypeEnum.AvatarUp)
-                    {
-                        // 角色池：非UP的4星里，角色和武器各 50%
-                        var pool = random.Next(0, 2) == 0 ? purpleAvatars : purpleWeapons;
-                        item = pool[random.Next(0, pool.Count)];
-                    }
-                    else if (GachaType == GachaTypeEnum.WeaponUp)
-                    {
-                        // 武器池：非UP的4星里，武器权重更高 (3:7)
-                        var pool = random.Next(0, 10) < 3 ? purpleAvatars : purpleWeapons;
-                        item = pool[random.Next(0, pool.Count)];
-                    }
-                    else
-                    {
-                        // 常驻/新手池：完全混合随机
-                        var allNormalItems = new List<int>();
-                        allNormalItems.AddRange(purpleAvatars);
-                        allNormalItems.AddRange(purpleWeapons);
-                        item = allNormalItems[random.Next(0, allNormalItems.Count)];
-                    }
-                }
-            }
+        if (random.NextDouble() < currentChance4 || data.LastGachaPurpleFailedCount >= 10)
+        {
+            data.LastGachaPurpleFailedCount = 0;
+            bool isUp = random.Next(0, 100) < 50 && RateUpItems4.Count > 0;
+            if (isUp) item = RateUpItems4[random.Next(0, RateUpItems4.Count)];
             else
             {
-                // 三星垫抽
-                item = blueWeapons[random.Next(0, blueWeapons.Count)];
+                var pool = GachaType == GachaTypeEnum.AvatarUp ? (random.Next(0, 2) == 0 ? purpleAvatars : purpleWeapons) : 
+                          (GachaType == GachaTypeEnum.WeaponUp ? (random.Next(0, 10) < 3 ? purpleAvatars : purpleWeapons) : 
+                          [.. purpleAvatars, .. purpleWeapons]);
+                item = pool[random.Next(0, pool.Count)];
             }
         }
-
-        LogGacha(uid, item);
-        return item;
+        else
+        {
+            item = blueWeapons[random.Next(0, blueWeapons.Count)];
+        }
     }
+
+    LogGacha(uid, item);
+    return item;
+}
 
     private void LogGacha(int uid, int item)
     {
@@ -162,8 +165,8 @@ public class BannerConfig
         var info = new GachaInfo
         {
             GachaId = (uint)GachaId,
-            IINCDJPOOMC = (uint)data.LastGachaFailedCount,
-            GDIFAAHIFBH = (uint)data.LastGachaPurpleFailedCount,
+           
+			GDIFAAHIFBH = (uint)data.NewbieGachaCount,						
             DetailWebview = $"http://{host}/gacha/history?id={GachaId}&uid={playerUid}",
             DropHistoryWebview = $"http://{host}/gacha/history?id={GachaId}&uid={playerUid}"
         };
