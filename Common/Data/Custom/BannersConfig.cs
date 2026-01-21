@@ -29,69 +29,96 @@ public class BannerConfig
     public int MaxCount { get; set; } = 90;
     public int EventChance { get; set; } = 50;
 
-    public int DoGacha(List<int> goldAvatars, List<int> purpleAvatars, List<int> purpleWeapons, List<int> goldWeapons,
-        List<int> blueWeapons, GachaData data, int uid)
+  public int DoGacha(List<int> goldAvatars, List<int> purpleAvatars, List<int> purpleWeapons, List<int> goldWeapons,
+    List<int> blueWeapons, GachaData data, int uid)
+{
+    var random = new Random();
+    
+    // --- 【核心修复 1：新手池 4001 特殊判定】 ---
+    int currentMaxCount = this.MaxCount; // 默认使用配置的 90 抽
+    if (this.GachaId == 4001)
     {
-        var random = new Random();
-        data.LastGachaFailedCount += 1;
-        int item;
+        // 如果数据库记录已抽满 50 次，直接拦截返回 0
+        if (data.NewbieGachaCount >= 50) return 0; 
+        
+        // 覆盖保底阈值为 50（新手池 50 必金）
+        currentMaxCount = 50; 
+        // 累加新手池独立计数
+        data.NewbieGachaCount += 1; 
+    }
 
-        var allGoldItems = new List<int>();
-        allGoldItems.AddRange(goldAvatars);
-        allGoldItems.AddRange(goldWeapons);
+    // --- 【核心修复 2：常驻池 1001 计数】 ---
+    if (this.GachaId == 1001)
+    {
+        // 累加 300 抽自选进度，这个字段对应 GachaCeiling 的 ceiling_num
+        data.StandardCumulativeCount += 1; 
+    }
 
-        var allNormalItems = new List<int>();
-        allNormalItems.AddRange(purpleAvatars);
-        allNormalItems.AddRange(purpleWeapons);
+    // 增加基础 5 星保底水位
+    data.LastGachaFailedCount += 1;
+    int item;
 
-        // 抽卡核心逻辑 (保持不变)
-        if (data.LastGachaFailedCount >= MaxCount || IsRateUp())
+    // 准备池子列表 (保持不变)
+    var allGoldItems = new List<int>();
+    allGoldItems.AddRange(goldAvatars);
+    allGoldItems.AddRange(goldWeapons);
+
+    var allNormalItems = new List<int>();
+    allNormalItems.AddRange(purpleAvatars);
+    allNormalItems.AddRange(purpleWeapons);
+
+    // --- 【核心修复 3：使用动态保底阈值】 ---
+    // 这里将原来的 MaxCount 替换为 currentMaxCount
+    if (data.LastGachaFailedCount >= currentMaxCount || IsRateUp())
+    {
+        data.LastGachaFailedCount = 0; // 触发金光，重置 5 星水位
+        
+        if (GachaType == GachaTypeEnum.WeaponUp)
         {
-            data.LastGachaFailedCount = 0;
-            if (GachaType == GachaTypeEnum.WeaponUp)
-            {
-                item = GetRateUpItem5(goldWeapons, data.LastWeaponGachaFailed);
-                data.LastWeaponGachaFailed = !RateUpItems5.Contains(item);
-            }
-            else if (GachaType == GachaTypeEnum.AvatarUp)
-            {
-                item = GetRateUpItem5(goldAvatars, data.LastAvatarGachaFailed);
-                data.LastAvatarGachaFailed = !RateUpItems5.Contains(item);
-            }
-            else
-            {
-                item = GetRateUpItem5(allGoldItems, false);
-            }
+            item = GetRateUpItem5(goldWeapons, data.LastWeaponGachaFailed);
+            data.LastWeaponGachaFailed = !RateUpItems5.Contains(item);
+        }
+        else if (GachaType == GachaTypeEnum.AvatarUp)
+        {
+            item = GetRateUpItem5(goldAvatars, data.LastAvatarGachaFailed);
+            data.LastAvatarGachaFailed = !RateUpItems5.Contains(item);
         }
         else
         {
-            if (IsRate4() || data.LastGachaPurpleFailedCount >= 10)
-            {
-                item = IsRateUp4() ? RateUpItems4[random.Next(0, RateUpItems4.Count)] : allNormalItems[random.Next(0, allNormalItems.Count)];
-                data.LastGachaPurpleFailedCount = 0;
-            }
-            else
-            {
-                item = blueWeapons[random.Next(0, blueWeapons.Count)];
-                data.LastGachaPurpleFailedCount += 1;
-            }
+            // 常驻或新手池逻辑
+            item = GetRateUpItem5(allGoldItems, false);
         }
-
-        // --- 按 UID 隔离记录本地日志 (保持不变) ---
-        try 
-        {
-            string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"GachaLog_{uid}.txt");
-            string logEntry = $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss} | Banner: {GachaId} | ItemID: {item}\n";
-            File.AppendAllText(logPath, logEntry);
-            Console.WriteLine($"[Gacha] UID: {uid} | Pool: {GachaId} | Item: {item}");
-        }
-        catch (Exception ex) 
-        {
-            Console.WriteLine($"[Error] Gacha log failed: {ex.Message}");
-        }
-
-        return item;
     }
+    else
+    {
+        // 4 星保底逻辑 (保持不变)
+        if (IsRate4() || data.LastGachaPurpleFailedCount >= 10)
+        {
+            item = IsRateUp4() ? RateUpItems4[random.Next(0, RateUpItems4.Count)] : allNormalItems[random.Next(0, allNormalItems.Count)];
+            data.LastGachaPurpleFailedCount = 0; // 触发紫光，重置 4 星水位
+        }
+        else
+        {
+            item = blueWeapons[random.Next(0, blueWeapons.Count)];
+            data.LastGachaPurpleFailedCount += 1; // 增加 4 星水位
+        }
+    }
+
+    // --- 本地日志记录逻辑 (保持不变) ---
+    try 
+    {
+        string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"GachaLog_{uid}.txt");
+        string logEntry = $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss} | Banner: {GachaId} | ItemID: {item}\n";
+        File.AppendAllText(logPath, logEntry);
+        Console.WriteLine($"[Gacha] UID: {uid} | Pool: {GachaId} | Item: {item}");
+    }
+    catch (Exception ex) 
+    {
+        Console.WriteLine($"[Error] Gacha log failed: {ex.Message}");
+    }
+
+    return item;
+}
 
     public GachaInfo ToInfo(List<int> goldAvatar, int playerUid)
     {
