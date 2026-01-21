@@ -126,46 +126,38 @@ public class RogueRoomInstance
    // GameServer/Game/Rogue/Scene/RogueRoomInstance.cs
 
     private int GetPrefixByWorldIndex(int index)
+{
+    return index switch
     {
-        return index switch
-        {
-            // // 世界1 前缀 3 (对应 301)
-			1 => 3, 
-			2 => 3, 
-            3 => 1111, 
-            
-            // 世界 4: 也用 2111 (大房间前缀)
-            4 => 2111, 
-            
-            // 其他保持原样
-            6 => 1221,
-            7 => 1321,
-            8 => 2001,
-            _ => 1111
-        };
-    }
+        1 => 3,    // 世界 1 (基座舱段)
+        2 => 3,    // 世界 2 (基座舱段)
+        3 => 1111, // 世界 3: 空间站/贝洛伯格上层
+        4 => 2111, // 世界 4: 贝洛伯格下层 (铆钉镇风格)
+        5 => 1321, // 世界 5: 仙舟罗浮 (对应卡芙卡风格)
+        6 => 1221, // 世界 6: 贝洛伯格雪山 (对应可可利亚风格)
+        7 => 1311, // 世界 7: 仙舟罗浮 (对应玄鹿风格)
+        8 => 2311, // 世界 8: 仙舟罗浮 (对应彦卿风格)
+        9 => 3111, // 世界 9: 匹诺康尼 (对应死亡风格)
+        _ => 1111
+    };
+}
 
-    private int GetBossRoomIdByWorldIndex(int index)
+   private int GetBossRoomIdByWorldIndex(int index)
+{
+    return index switch
     {
-        return index switch
-        {
-            //
-			1 => 307, 
-			2 => 307, 
-            3 => 111713, 
-            
-            // 世界 4 (史瓦罗): 也用 211713 (大房间)
-            // 没错，两个世界共用同一个房间地图！区别在于刷出来的怪。
-            4 => 131713,
-			5 => 132713,
-            
-            // 其他
-            6 => 122713,
-            7 => 132713,
-            8 => 200713,
-            _ => 111713
-        };
-    }
+        1 => 307,
+        2 => 307,
+        3 => 111713, // 对应 JSON 中 ContentID 改为 13901 (杰帕德)
+        4 => 211713, // 对应 JSON 中 ContentID 改为 14901 (史瓦罗) - 保持下层区风格
+        5 => 132713, // 对应 JSON 中 ContentID 改为 15901 (卡芙卡) - 回归仙舟风格
+        6 => 122713, // 对应 JSON 中 ContentID 改为 16901 (可可利亚) - 雪山风格
+        7 => 222713, // 对应 JSON 中 ContentID 改为 17901 (丰饶玄鹿)
+        8 => 231713, // 对应 JSON 中 ContentID 改为 18901 (彦卿)
+        9 => 311713, // 对应 JSON 中 ContentID 改为 19901 (何物朝向死亡)
+        _ => 111713
+    };
+}
 
     public RogueRoom ToProto()
     {
