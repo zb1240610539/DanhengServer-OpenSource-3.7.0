@@ -15,7 +15,6 @@ public class BannersConfig
 
 public class BannerConfig
 {
-    // --- 性能优化：静态缓存变量与锁 ---
     private static string? _cachedHost;
     private static readonly object _configLock = new();
 
@@ -25,7 +24,7 @@ public class BannerConfig
     public GachaTypeEnum GachaType { get; set; }
     public List<int> RateUpItems5 { get; set; } = [];
     public List<int> RateUpItems4 { get; set; } = [];
-    public int GetRateUpItem5Chance { get; set; } = 6; // 基础万分比，6 = 0.6%
+    public int GetRateUpItem5Chance { get; set; } = 6;
     public int MaxCount { get; set; } = 90;
     public int EventChance { get; set; } = 50;
 
@@ -34,43 +33,37 @@ public class BannerConfig
     {
         var random = new Random();
         
-        // --- 【核心修复 1：新手池 4001 特殊判定】 ---
-        int currentMaxCount = this.MaxCount; 
-        int softPityStart5 = (GachaType == GachaTypeEnum.WeaponUp) ? 62 : 72; // 软保底开始水位
+        // --- 1. 初始化保底与软保底阈值 ---
+        int currentMaxCount = this.MaxCount;
+        int softPityStart5 = (GachaType == GachaTypeEnum.WeaponUp) ? 62 : 72; // 5星软保底：武器63，其他73
 
         if (this.GachaId == 4001)
         {
             if (data.NewbieGachaCount >= 50) return 0; 
             currentMaxCount = 50; 
-            softPityStart5 = 40; // 新手池 40 抽开始软保底
+            softPityStart5 = 40; 
             data.NewbieGachaCount += 1; 
         }
 
-        // --- 【核心修复 2：常驻池 1001 计数】 ---
-        if (this.GachaId == 1001)
-        {
-            data.StandardCumulativeCount += 1; 
-        }
+        if (this.GachaId == 1001) data.StandardCumulativeCount += 1; 
 
-        // 水位累加
         data.LastGachaFailedCount += 1;
         data.LastGachaPurpleFailedCount += 1;
 
         int item;
 
-        // 准备池子列表
-        var allGoldItems = [.. goldAvatars, .. goldWeapons];
-        var allNormalItems = [.. purpleAvatars, .. purpleWeapons];
+        // 修复 CS9176：改回显式创建 List
+        var allGoldItems = new List<int>();
+        allGoldItems.AddRange(goldAvatars);
+        allGoldItems.AddRange(goldWeapons);
 
-        // --- 【核心修改：计算动态 5 星概率】 ---
-        double currentChance5 = GetRateUpItem5Chance / 1000.0; // 基础 0.006
+        // --- 2. 五星判定逻辑 (软保底) ---
+        double currentChance5 = GetRateUpItem5Chance / 1000.0; // 0.006
         if (data.LastGachaFailedCount > softPityStart5)
         {
-            // 软保底公式：基础概率 + 超过水位后的每抽 6% 提升
             currentChance5 += 0.06 * (data.LastGachaFailedCount - softPityStart5);
         }
 
-        // --- 5 星判定 ---
         if (random.NextDouble() < currentChance5 || data.LastGachaFailedCount >= currentMaxCount)
         {
             data.LastGachaFailedCount = 0; 
@@ -90,40 +83,69 @@ public class BannerConfig
                 item = GetRateUpItem5(allGoldItems, false);
             }
         }
-        // --- 4 星判定 (包含软保底) ---
+        // --- 3. 四星判定逻辑 (软保底 + 掉落分类) ---
         else
         {
             double currentChance4 = 0.051; // 基础 5.1%
-            if (data.LastGachaPurpleFailedCount >= 8)
-            {
-                // 4 星软保底：第 8、9 抽概率激增到 51%
-                currentChance4 = 0.51; 
-            }
+            // 官服规律：第 9 抽软保底概率激增
+            if (data.LastGachaPurpleFailedCount >= 9) currentChance4 = 0.51;
 
             if (random.NextDouble() < currentChance4 || data.LastGachaPurpleFailedCount >= 10)
             {
                 data.LastGachaPurpleFailedCount = 0;
-                // 判定是否出 UP
+                
+                // 判定是否出 4星 UP
                 bool isUp = random.Next(0, 100) < 50 && RateUpItems4.Count > 0;
-                item = isUp ? RateUpItems4[random.Next(0, RateUpItems4.Count)] : allNormalItems[random.Next(0, allNormalItems.Count)];
+
+                if (isUp)
+                {
+                    item = RateUpItems4[random.Next(0, RateUpItems4.Count)];
+                }
+                else
+                {
+                    // 根据卡池类型决定掉落倾向 (官服区分角色/武器)
+                    if (GachaType == GachaTypeEnum.AvatarUp)
+                    {
+                        // 角色池：非UP的4星里，角色和武器各 50%
+                        var pool = random.Next(0, 2) == 0 ? purpleAvatars : purpleWeapons;
+                        item = pool[random.Next(0, pool.Count)];
+                    }
+                    else if (GachaType == GachaTypeEnum.WeaponUp)
+                    {
+                        // 武器池：非UP的4星里，武器权重更高 (3:7)
+                        var pool = random.Next(0, 10) < 3 ? purpleAvatars : purpleWeapons;
+                        item = pool[random.Next(0, pool.Count)];
+                    }
+                    else
+                    {
+                        // 常驻/新手池：完全混合随机
+                        var allNormalItems = new List<int>();
+                        allNormalItems.AddRange(purpleAvatars);
+                        allNormalItems.AddRange(purpleWeapons);
+                        item = allNormalItems[random.Next(0, allNormalItems.Count)];
+                    }
+                }
             }
-            // --- 3 星判定 ---
             else
             {
+                // 三星垫抽
                 item = blueWeapons[random.Next(0, blueWeapons.Count)];
             }
         }
 
-        // --- 本地日志记录 ---
+        LogGacha(uid, item);
+        return item;
+    }
+
+    private void LogGacha(int uid, int item)
+    {
         try 
         {
             string logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"GachaLog_{uid}.txt");
             string logEntry = $"Time: {DateTime.Now:yyyy-MM-dd HH:mm:ss} | Banner: {GachaId} | ItemID: {item}\n";
             File.AppendAllText(logPath, logEntry);
         }
-        catch (Exception ex) { Console.WriteLine($"[Error] Gacha log failed: {ex.Message}"); }
-
-        return item;
+        catch (Exception) { /* ignored */ }
     }
 
     public GachaInfo ToInfo(List<int> goldAvatar, int playerUid, GachaData data) 
@@ -168,7 +190,6 @@ public class BannerConfig
                 AvatarList = { goldAvatar.Select(id => new GachaCeilingAvatar { AvatarId = (uint)id }) }
             };
         }
-
         return info;
     }
 
@@ -187,11 +208,12 @@ public class BannerConfig
                 return $"{address}:{port}";
             }
         }
-        catch (Exception ex) { Console.WriteLine($"[Gacha] 读取 Config.json 失败: {ex.Message}"); }
+        catch { /* ignored */ }
         return null;
     }
 
     public bool IsEvent() => new Random().Next(0, 100) < EventChance;
+
     public int GetRateUpItem5(List<int> gold, bool forceUp)
     {
         var random = new Random();
