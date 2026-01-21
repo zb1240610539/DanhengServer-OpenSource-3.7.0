@@ -120,60 +120,64 @@ public class BannerConfig
     return item;
 }
 
-    public GachaInfo ToInfo(List<int> goldAvatar, int playerUid)
+  // 核心修复：确保方法签名接收 data 参数，解决 CS0103
+public GachaInfo ToInfo(List<int> goldAvatar, int playerUid, GachaData data) 
+{
+    // --- 静态配置缓存逻辑保持不变 ---
+    if (_cachedHost == null)
     {
-        // --- 静态配置缓存优化逻辑 ---
-        if (_cachedHost == null)
+        lock (_configLock)
         {
-            lock (_configLock)
+            if (_cachedHost == null)
             {
-                if (_cachedHost == null)
-                {
-                    _cachedHost = LoadHostFromConfig();
-                }
+                _cachedHost = LoadHostFromConfig();
             }
         }
-        string host = _cachedHost ?? "127.0.0.1:520"; 
-
-        var info = new GachaInfo
-        {   
-            GachaId = (uint)GachaId,
-            // 【核心修复】同步当前水位到混淆字段，解决 UI 按钮不跳数字的问题
-        	CeilingNum = (uint)data.LastGachaFailedCount, 
-        	GDIFAAHIFBH = (uint)data.LastGachaPurpleFailedCount,
-            DetailWebview = $"http://{host}/gacha/history?id={GachaId}&uid={playerUid}",
-            DropHistoryWebview = $"http://{host}/gacha/history?id={GachaId}&uid={playerUid}"
-        };
-		// --- 【核心修复：新手池特殊 UI】 ---
-    	if (GachaId == 4001)
-    	{	
-        info.IINCDJPOOMC = 8; // 混淆字段赋值 8，开启客户端“8折”标签显示
-    	}
-        if (GachaType != GachaTypeEnum.Normal)
-        {
-            info.BeginTime = BeginTime;
-            info.EndTime = EndTime;
-        }
-
-        if (RateUpItems4.Count > 0) info.ItemDetailList.AddRange(RateUpItems4.Select(id => (uint)id));
-        if (RateUpItems5.Count > 0)
-        {
-            info.PrizeItemList.AddRange(RateUpItems5.Select(id => (uint)id));
-            info.ItemDetailList.AddRange(RateUpItems5.Select(id => (uint)id));
-        }
-
-        if (GachaId == 1001)
-        {
-            info.GachaCeiling = new GachaCeiling
-            {
-                IsClaimed = data.IsStandardSelected, // 是否已领过奖
-            	CeilingNum = (uint)data.StandardCumulativeCount, // 实时同步 300 抽进度 (x/300)
-                AvatarList = { goldAvatar.Select(id => new GachaCeilingAvatar { AvatarId = (uint)id }) }
-            };
-        }
-
-        return info;
     }
+    string host = _cachedHost ?? "127.0.0.1:520"; 
+
+    var info = new GachaInfo
+    {
+        GachaId = (uint)GachaId,
+        // 核心修复：删除不存在于 GachaInfo 的 info.CeilingNum
+        // 使用混淆字段同步 5 星水位 (解决 UI 显示问题)
+        IINCDJPOOMC = (uint)data.LastGachaFailedCount,
+        // 使用混淆字段同步 4 星水位
+        GDIFAAHIFBH = (uint)data.LastGachaPurpleFailedCount,
+        
+        DetailWebview = $"http://{host}/gacha/history?id={GachaId}&uid={playerUid}",
+        DropHistoryWebview = $"http://{host}/gacha/history?id={GachaId}&uid={playerUid}"
+    };
+
+    // 时间逻辑
+    if (GachaType != GachaTypeEnum.Normal)
+    {
+        info.BeginTime = BeginTime;
+        info.EndTime = EndTime;
+    }
+
+    // 物品填充逻辑
+    if (RateUpItems4.Count > 0) info.ItemDetailList.AddRange(RateUpItems4.Select(id => (uint)id));
+    if (RateUpItems5.Count > 0)
+    {
+        info.PrizeItemList.AddRange(RateUpItems5.Select(id => (uint)id));
+        info.ItemDetailList.AddRange(RateUpItems5.Select(id => (uint)id));
+    }
+
+    // --- 核心修复：常驻自选逻辑 (1001) ---
+    if (GachaId == 1001)
+    {
+        // 只有在这里，CeilingNum 才是合法的，因为它属于 GachaCeiling 类
+        info.GachaCeiling = new GachaCeiling
+        {
+            IsClaimed = data.IsStandardSelected,
+            CeilingNum = (uint)data.StandardCumulativeCount, 
+            AvatarList = { goldAvatar.Select(id => new GachaCeilingAvatar { AvatarId = (uint)id }) }
+        };
+    }
+
+    return info;
+}
 
     // 辅助方法：仅在缓存失效时调用
     private string? LoadHostFromConfig()
