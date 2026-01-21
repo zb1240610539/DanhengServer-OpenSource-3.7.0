@@ -1,6 +1,10 @@
 ﻿using EggLink.DanhengServer.GameServer.Server.Packet.Send.Friend;
 using EggLink.DanhengServer.Kcp;
 using EggLink.DanhengServer.Proto;
+using EggLink.DanhengServer.Database;              // 提供 DatabaseHelper
+using EggLink.DanhengServer.Database.Player;       // 提供 PlayerData
+using EggLink.DanhengServer.Database.Avatar;       // 提供 AvatarData 和 PlayerDataCollection
+using EggLink.DanhengServer.Database.Inventory;    // 提供 InventoryData
 
 namespace EggLink.DanhengServer.GameServer.Server.Packet.Recv.Friend;
 [Opcode(CmdIds.GetPlayerDetailInfoCsReq)]
