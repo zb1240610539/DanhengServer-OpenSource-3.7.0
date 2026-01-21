@@ -136,12 +136,19 @@ public class BannerConfig
         string host = _cachedHost ?? "127.0.0.1:520"; 
 
         var info = new GachaInfo
-        {
+        {   
             GachaId = (uint)GachaId,
+            // 【核心修复】同步当前水位到混淆字段，解决 UI 按钮不跳数字的问题
+        	CeilingNum = (uint)data.LastGachaFailedCount, 
+        	GDIFAAHIFBH = (uint)data.LastGachaPurpleFailedCount,
             DetailWebview = $"http://{host}/gacha/history?id={GachaId}&uid={playerUid}",
             DropHistoryWebview = $"http://{host}/gacha/history?id={GachaId}&uid={playerUid}"
         };
-
+		// --- 【核心修复：新手池特殊 UI】 ---
+    	if (GachaId == 4001)
+    	{	
+        info.IINCDJPOOMC = 8; // 混淆字段赋值 8，开启客户端“8折”标签显示
+    	}
         if (GachaType != GachaTypeEnum.Normal)
         {
             info.BeginTime = BeginTime;
@@ -159,7 +166,8 @@ public class BannerConfig
         {
             info.GachaCeiling = new GachaCeiling
             {
-                IsClaimed = false,
+                IsClaimed = data.IsStandardSelected, // 是否已领过奖
+            	CeilingNum = (uint)data.StandardCumulativeCount, // 实时同步 300 抽进度 (x/300)
                 AvatarList = { goldAvatar.Select(id => new GachaCeilingAvatar { AvatarId = (uint)id }) }
             };
         }
