@@ -1242,7 +1242,7 @@ public class InventoryManager(PlayerInstance player) : BasePlayerManager(player)
 
     // 5. 【核心优化】：调用批量扣除
     // 使用 RemoveItems 内部的 sync: true 逻辑，它会自动把这几种材料打包成一个 PacketPlayerSyncScNotify 发出
-    var removed = await Player.InventoryManager!.RemoveItems(costItems, sync: true);
+    var removed = await Player.InventoryManager!.RemoveItems(costItems, sync: false);
     
     // 如果扣除失败（例如数量不够），直接返回
     if (removed.Count < costItems.Count) return false; 
@@ -1313,11 +1313,11 @@ public async ValueTask<List<ItemData>> LevelUpRelic(int uniqueId, ItemCostData c
     var exp = 0;
     var money = 0;
     
-    // 【核心优化】：创建同步列表，收集所有背包变化
+    // 准备同步列表，收集所有背包变化
     List<ItemData> inventoryChangeList = [];
-    List<(int, int, int)> batchRemoveList = [];
+    List<(int itemId, int count, int uniqueId)> batchRemoveList = [];
 
-    // 1. 预处理消耗逻辑
+    // 1. 预处理：计算消耗并加入批量列表
     foreach (var cost in costData.ItemList)
     {
         if (cost.PileItem != null)
@@ -1328,7 +1328,7 @@ public async ValueTask<List<ItemData>> LevelUpRelic(int uniqueId, ItemCostData c
                 exp += excel.ExpProvide * (int)cost.PileItem.ItemNum;
                 money += excel.CoinCost * (int)cost.PileItem.ItemNum;
             }
-            // 加入批量扣除列表 (sync: false)
+            // 加入批量扣除列表
             batchRemoveList.Add(((int)cost.PileItem.ItemId, (int)cost.PileItem.ItemNum, 0));
         }
         else if (cost.RelicUniqueId != 0)
@@ -1339,66 +1339,95 @@ public async ValueTask<List<ItemData>> LevelUpRelic(int uniqueId, ItemCostData c
                 GameData.RelicConfigData.TryGetValue(costItem.ItemId, out var costExcel);
                 if (costExcel == null) continue;
 
-                // 计算经验逻辑（保持原样）...
+                // 还原遗器狗粮的经验值
                 if (costItem.Level > 0)
+                {
                     foreach (var level in Enumerable.Range(0, costItem.Level))
                     {
                         GameData.RelicExpTypeData.TryGetValue(costExcel.ExpType * 100 + level, out var typeExcel);
                         if (typeExcel != null) exp += typeExcel.Exp;
                     }
-                else exp += costExcel.ExpProvide;
+                }
+                else
+                {
+                    exp += costExcel.ExpProvide;
+                }
 
                 exp += costItem.Exp;
                 money += costExcel.CoinCost;
 
-                // 加入批量扣除列表，注意 uniqueId 必须传
+                // 加入批量扣除列表
                 batchRemoveList.Add((costItem.ItemId, 1, (int)cost.RelicUniqueId));
             }
         }
     }
 
-    // 执行批量扣费和扣狗粮
-    // 调用之前写的批量方法，sync 设为 false，我们最后统一发包
-    var removed = await RemoveItems(batchRemoveList, sync: false);
-    inventoryChangeList.AddRange(removed);
+    // 2. 执行数据扣除（sync: false，防止循环发包卡死）
+    var removedItems = await RemoveItems(batchRemoveList, sync: false);
+    inventoryChangeList.AddRange(removedItems);
 
     // 扣除金币 (Scoin)
     await RemoveItem(2, money, sync: false);
-    // 虚拟货币由于通过 Player.ToProto 同步，不需要放入 inventoryChangeList
 
-    // 2. 执行升级逻辑 (保持原样)
+    // 3. 执行升级逻辑（完整保留你的计算逻辑）
     GameData.RelicConfigData.TryGetValue(relicItem.ItemId, out var relicExcel);
     if (relicExcel == null) return [];
+
     GameData.RelicExpTypeData.TryGetValue(relicExcel.ExpType * 100 + relicItem.Level, out var relicType);
     
-    do {
-        if (relicType == null) break;
-        int toGain = (relicItem.Exp + exp >= relicType.Exp) ? (relicType.Exp - relicItem.Exp) : exp;
+    while (exp > 0 && relicType != null && relicItem.Level < relicExcel.MaxLevel)
+    {
+        int requiredExp = relicType.Exp - relicItem.Exp;
+        int toGain = (exp >= requiredExp) ? requiredExp : exp;
+        
         relicItem.Exp += toGain;
         exp -= toGain;
 
-        if (relicItem.Exp >= relicType.Exp) {
+        // 触发升级
+        if (relicItem.Exp >= relicType.Exp)
+        {
             relicItem.Exp = 0;
             relicItem.Level++;
+            
+            // 重新获取下一级所需经验配置
             GameData.RelicExpTypeData.TryGetValue(relicExcel.ExpType * 100 + relicItem.Level, out relicType);
-            if (relicItem.Level % 3 == 0) {
-                if (relicItem.SubAffixes.Count >= 4) relicItem.IncreaseRandomRelicSubAffix();
-                else relicItem.AddRandomRelicSubAffix();
+            
+            // 遗器属性强化：每3级增加/强化词条
+            if (relicItem.Level % 3 == 0)
+            {
+                if (relicItem.SubAffixes.Count >= 4)
+                    relicItem.IncreaseRandomRelicSubAffix();
+                else
+                    relicItem.AddRandomRelicSubAffix();
             }
         }
-    } while (exp > 0 && relicType?.Exp > 0 && relicItem.Level < relicExcel.MaxLevel);
+    }
 
-    // 3. 处理经验返还 (Leftover)
+    // 4. 处理多余经验返还 (Leftover)
     Dictionary<int, ItemData> leftoverSync = [];
     var leftover = exp;
-    while (leftover > 0) {
+    while (leftover > 0)
+    {
         var gain = false;
-        foreach (var expItem in GameData.RelicExpItemData.Values.Reverse()) {
-            if (leftover >= expItem.ExpProvide) {
-                // PutItem 改为 sync: false
-                var dbItem = await PutItem(expItem.ItemID, 1, sync: false);
-                if (dbItem != null) leftoverSync[expItem.ItemID] = dbItem;
+        // 按照经验提供量从大到小返还材料
+        foreach (var expItem in GameData.RelicExpItemData.Values.Reverse())
+        {
+            if (leftover >= expItem.ExpProvide)
+            {
+                // 使用 PutItem 静默添加数据
+                var dbItem = await PutItem(expItem.ItemID, 1);
                 
+                if (leftoverSync.TryGetValue(expItem.ItemID, out var existing))
+                {
+                    existing.Count++;
+                }
+                else
+                {
+                    var clone = dbItem.Clone();
+                    clone.Count = 1; 
+                    leftoverSync[expItem.ItemID] = clone;
+                }
+
                 leftover -= expItem.ExpProvide;
                 gain = true;
                 break;
@@ -1407,16 +1436,19 @@ public async ValueTask<List<ItemData>> LevelUpRelic(int uniqueId, ItemCostData c
         if (!gain) break;
     }
 
-    // 4. 【终极同步：一气呵成】
-    // A. 同步所有背包变化（扣除的狗粮、消耗的材料、新增的返还材料）
-    List<ItemData> finalSyncList = [.. inventoryChangeList, .. leftoverSync.Values];
-    if (finalSyncList.Count > 0)
-        await Player.SendPacket(new PacketPlayerSyncScNotify(finalSyncList));
+    // 5. 【合并同步】
+    
+    // A. 合并背包所有格子的变动（消耗掉的狗粮 + 返还的材料）
+    List<ItemData> allChanges = [.. inventoryChangeList, .. leftoverSync.Values];
+    if (allChanges.Count > 0)
+    {
+        await Player.SendPacket(new PacketPlayerSyncScNotify(allChanges));
+    }
 
-    // B. 同步货币 (金币)
+    // B. 同步货币（刷新金币顶栏）
     await Player.SendPacket(new PacketPlayerSyncScNotify(Player.ToProto()));
 
-    // C. 同步遗器状态（等级、经验、新词条）
+    // C. 同步强化目标遗器的最终状态（等级、经验、新词条）
     await Player.SendPacket(new PacketPlayerSyncScNotify(relicItem));
 
     return [.. leftoverSync.Values];

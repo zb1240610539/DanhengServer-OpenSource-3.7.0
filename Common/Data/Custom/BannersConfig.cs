@@ -34,109 +34,85 @@ public class BannerConfig
 {
     var random = new Random();
     
-    // --- 1. 精准获取当前池子的水位标记 ---
+    // --- 1. 根据当前卡池类型，从 GachaData 中精准获取水位 ---
     int pityCount = 0;
     if (this.GachaId == 4001) pityCount = data.NewbiePityCount;
-    else if (this.GachaId == 1001) pityCount = data.StandardPityCount; // 使用新增的保底标记
-    else pityCount = data.LastGachaFailedCount; // 限定池使用此通用计数
+    else if (this.GachaId == 1001) pityCount = data.StandardPityCount;
+    else if (GachaType == GachaTypeEnum.AvatarUp) pityCount = data.LastAvatarGachaPity; 
+    else if (GachaType == GachaTypeEnum.WeaponUp) pityCount = data.LastWeaponGachaPity;
 
-    int currentMaxCount = this.MaxCount;
+    // 设置保底参数：武器池 80 满保底，角色池 90
+    int currentMaxCount = (GachaType == GachaTypeEnum.WeaponUp) ? 80 : 90;
     int softPityStart5 = (GachaType == GachaTypeEnum.WeaponUp) ? 62 : 72; 
 
-    // --- 2. 独立计数累加逻辑 ---
-    if (this.GachaId == 4001)
-    {
-       
-        currentMaxCount = 50; 
-        softPityStart5 = 40; 
-        data.NewbieGachaCount += 1;
+    // --- 2. 独立累加水位 (在判定本次产出前先增加计数) ---
+    if (this.GachaId == 4001) {
+        data.NewbiePityCount++;
+        data.NewbieGachaCount++; // 新手池总计 50 次限制
     }
-    else if (this.GachaId == 1001)
-    {
-        data.StandardCumulativeCount += 1; // 300抽自选进度永远累加
-        data.StandardPityCount += 1;
-		data.NewbiePityCount += 1;		// 常驻池保底水位累加
+    else if (this.GachaId == 1001) {
+        data.StandardPityCount++;
+        data.StandardCumulativeCount++; // 常驻/300抽自选进度
     }
-    else
-    {
-        data.LastGachaFailedCount += 1;    // 限定池水位累加
+    else if (GachaType == GachaTypeEnum.AvatarUp) {
+        data.LastAvatarGachaPity++; 
+    }
+    else if (GachaType == GachaTypeEnum.WeaponUp) {
+        data.LastWeaponGachaPity++; 
     }
 
-    data.LastGachaPurpleFailedCount += 1;
+    data.LastGachaPurpleFailedCount++; // 四星水位是通用的
+
+    // --- 3. 五星判定概率计算 ---
+    double currentChance5 = GetRateUpItem5Chance / 1000.0; 
+    if (pityCount >= softPityStart5) {
+        // 软保底概率递增：武器池每抽约+7%，角色池每抽约+6%
+        currentChance5 += (GachaType == GachaTypeEnum.WeaponUp ? 0.07 : 0.06) * (pityCount - softPityStart5 + 1);
+    }
 
     int item;
-    var allGoldItems = new List<int>();
-    allGoldItems.AddRange(goldAvatars);
-    allGoldItems.AddRange(goldWeapons);
+    // 判定是否出金 (随机数小于概率，或达到硬保底)
+    if (random.NextDouble() < currentChance5 || pityCount + 1 >= currentMaxCount) {
+        // --- 4. 【核心修复】触发五星后，精准重置对应的水位字段 ---
+        if (this.GachaId == 1001) data.StandardPityCount = 0;
+        else if (this.GachaId == 4001) data.NewbiePityCount = 0;
+        else if (GachaType == GachaTypeEnum.AvatarUp) data.LastAvatarGachaPity = 0;
+        else if (GachaType == GachaTypeEnum.WeaponUp) data.LastWeaponGachaPity = 0;
 
-    // --- 3. 五星判定 (基于 pityCount) ---
-    double currentChance5 = GetRateUpItem5Chance / 1000.0; 
-    if (pityCount > softPityStart5)
-    {
-        currentChance5 += 0.06 * (pityCount - softPityStart5);
-    }
-
-    if (random.NextDouble() < currentChance5 || pityCount >= currentMaxCount)
-    {
-        if (GlobalDebug.EnableVerboseLog)
-            Console.WriteLine($"[GACHA_DEBUG] !!!金光闪烁!!! UID:{uid} Banner:{GachaId} 第 {pityCount} 抽触发");
-
-        // --- 4. 独立重置逻辑 ---
-        if (this.GachaId == 1001)
-        {
-            data.StandardPityCount = 0; // 仅重置常驻保底，不重置300抽进度
-        }
-        else if (this.GachaId != 4001)
-        {
-            data.NewbiePityCount = 0; // 重置限定池保底
-        }
-		else
-        {
-            data.LastGachaFailedCount = 0;
-        }
-
-        // 确定获得物品
-        if (GachaType == GachaTypeEnum.WeaponUp)
-        {
+        // 确定产出并处理大保底逻辑
+        if (GachaType == GachaTypeEnum.WeaponUp) {
             item = GetRateUpItem5(goldWeapons, data.LastWeaponGachaFailed);
-            data.LastWeaponGachaFailed = !RateUpItems5.Contains(item);
+            data.LastWeaponGachaFailed = !RateUpItems5.Contains(item); // 没抽到UP则下次必出
         }
-        else if (GachaType == GachaTypeEnum.AvatarUp)
-        {
+        else if (GachaType == GachaTypeEnum.AvatarUp) {
             item = GetRateUpItem5(goldAvatars, data.LastAvatarGachaFailed);
-            data.LastAvatarGachaFailed = !RateUpItems5.Contains(item);
+            data.LastAvatarGachaFailed = !RateUpItems5.Contains(item); // 没抽到UP则下次必出
         }
-        else
-        {
-            item = GetRateUpItem5(allGoldItems, false);
+        else {
+            item = GetRateUpItem5([.. goldAvatars, .. goldWeapons], false);
         }
     }
-    else
-    {
-        // --- 四星及以下判定 ---
+    else {
+        // --- 5. 四星及三星判定逻辑 ---
         double currentChance4 = 0.051; 
         if (data.LastGachaPurpleFailedCount >= 9) currentChance4 = 0.51;
 
-        if (random.NextDouble() < currentChance4 || data.LastGachaPurpleFailedCount >= 10)
-        {
+        if (random.NextDouble() < currentChance4 || data.LastGachaPurpleFailedCount >= 10) {
             data.LastGachaPurpleFailedCount = 0;
             bool isUp = random.Next(0, 100) < 50 && RateUpItems4.Count > 0;
             if (isUp) item = RateUpItems4[random.Next(0, RateUpItems4.Count)];
-            else
-            {
+            else {
                 var pool = GachaType == GachaTypeEnum.AvatarUp ? (random.Next(0, 2) == 0 ? purpleAvatars : purpleWeapons) : 
                           (GachaType == GachaTypeEnum.WeaponUp ? (random.Next(0, 10) < 3 ? purpleAvatars : purpleWeapons) : 
                           [.. purpleAvatars, .. purpleWeapons]);
                 item = pool[random.Next(0, pool.Count)];
             }
         }
-        else
-        {
+        else {
             item = blueWeapons[random.Next(0, blueWeapons.Count)];
         }
     }
-
-    LogGacha(uid, item);
+    
     return item;
 }
 

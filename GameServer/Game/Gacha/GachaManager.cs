@@ -100,164 +100,137 @@ public class GachaManager : BasePlayerManager
     }
 
 public async ValueTask<DoGachaScRsp?> DoGacha(int bannerId, int times)
+{
+    // 1. 日志与卡池验证
+    Console.WriteLine($"\n[GACHA_DEBUG] 收到抽卡请求 -> UID: {Player.Uid} | Banner: {bannerId} | Times: {times}");
+
+    var banner = GameData.BannersConfig.Banners.Find(x => x.GachaId == bannerId);
+    if (banner == null) return null;
+
+    if (bannerId == 4001 && (times != 10 || GachaData.NewbieGachaCount > 50))
     {
-        // 1. 日志与卡池验证
-        Console.WriteLine($"\n[GACHA_DEBUG] 收到抽卡请求 -> UID: {Player.Uid} | Banner: {bannerId} | Times: {times}");
+        Console.WriteLine("[GACHA_WARNING] 新手池请求非法");
+        return null;
+    }
 
-        var banner = GameData.BannersConfig.Banners.Find(x => x.GachaId == bannerId);
-        if (banner == null) return null;
+    // 2. 补票与扣费逻辑 (静默扣除 sync: false)
+    int actualCost = (bannerId == 4001 && times == 10) ? 8 : times;
+    int ticketId = (int)banner.GachaType.GetCostItemId();
 
-        if (bannerId == 4001 && (times != 10 || GachaData.NewbieGachaCount > 50))
+    // 核心改进：使用 Dictionary 收集所有需要同步的物品，Key 为 string(防止ID/UniqueId冲突)
+    var syncMap = new Dictionary<string, ItemData>();
+
+    if (Player.InventoryManager!.GetItemCount(ticketId) < actualCost)
+    {
+        int deficit = actualCost - Player.InventoryManager.GetItemCount(ticketId);
+        var costHcoin = await Player.InventoryManager.RemoveItem(1, deficit * 160, sync: false);
+        if (costHcoin != null) syncMap["1"] = costHcoin; // 记录扣除后的星琼状态
+        
+        await Player.InventoryManager.AddItem(ticketId, deficit, sync: false);
+    }
+    var ticket = await Player.InventoryManager.RemoveItem(ticketId, actualCost, sync: false);
+    if (ticket != null) syncMap[ticketId.ToString()] = ticket; // 记录券的状态
+
+    // 3. 执行抽卡内核
+    var decideItem = GachaData.GachaDecideOrder.Count >= 7 ? GachaData.GachaDecideOrder.GetRange(0, 7) : GachaData.GachaDecideOrder;
+    var resultIds = new List<int>();
+    for (var i = 0; i < times; i++)
+    {
+        var item = banner.DoGacha(decideItem, GetPurpleAvatars(), GetPurpleWeapons(), GetGoldWeapons(), GetBlueWeapons(), GachaData, Player.Uid);
+        if (item == 0) break;
+        resultIds.Add(item);
+    }
+
+    // 4. 处理物品发放与副产物
+    var gachaItems = new List<GachaItem>();
+
+    foreach (var item in resultIds)
+    {
+        var rarity = GetRarity(item);
+        var gItem = new GachaItem { GachaItem_ = new Item { ItemId = (uint)item, Num = 1, Level = 1, Rank = 1 } };
+        gItem.TransferItemList = new ItemList();
+
+        int star = 0, dirt = 0;
+        if (rarity == 5) star = 20; 
+        else if (rarity == 4) star = 8;
+        else dirt = 20;
+
+        GachaData.GachaHistory.Add(new GachaInfo { GachaId = bannerId, ItemId = item, Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds() });
+
+        // A. 角色入库逻辑
+        if (GameData.ItemConfigData[item].ItemMainType == ItemMainTypeEnum.AvatarCard)
         {
-            Console.WriteLine("[GACHA_WARNING] 新手池请求非法（非10连或已抽满）");
-            return null;
-        }
-
-        // 2. 补票与扣费逻辑
-        int actualCost = (bannerId == 4001 && times == 10) ? 8 : times;
-        int ticketId = (int)banner.GachaType.GetCostItemId();
-
-        if (Player.InventoryManager!.GetItemCount(ticketId) < actualCost)
-        {
-            int deficit = actualCost - Player.InventoryManager.GetItemCount(ticketId);
-            var costHcoin = await Player.InventoryManager.RemoveItem(1, deficit * 160, sync: false);
-            if (costHcoin == null) return null;
-            await Player.InventoryManager.AddItem(ticketId, deficit, sync: false);
-        }
-        await Player.InventoryManager.RemoveItem(ticketId, actualCost, sync: false);
-
-        // 3. 执行抽卡内核
-        var decideItem = GachaData.GachaDecideOrder.Count >= 7 ? GachaData.GachaDecideOrder.GetRange(0, 7) : GachaData.GachaDecideOrder;
-        var items = new List<int>();
-        for (var i = 0; i < times; i++)
-        {
-            var item = banner.DoGacha(decideItem, GetPurpleAvatars(), GetPurpleWeapons(), GetGoldWeapons(),
-                GetBlueWeapons(), GachaData, Player.Uid);
-            if (item == 0) break;
-            items.Add(item);
-        }
-
-        // 4. 【核心补全】物品发放、副产物计算与同步包构造
-        var gachaItems = new List<GachaItem>();
-        var syncItems = new List<ItemData> { 
-            new ItemData { ItemId = ticketId, Count = (int)Player.InventoryManager!.GetItemCount(ticketId) },
-            new ItemData { ItemId = 1, Count = (int)Player.Data.Hcoin }
-        };
-
-        foreach (var item in items)
-        {
-            var rarity = GetRarity(item);
-            var gachaItem = new GachaItem { GachaItem_ = new Item { ItemId = (uint)item, Num = 1, Level = 1, Rank = 1 } };
-            gachaItem.TransferItemList = new ItemList();
-
-            int star = 0, dirt = 0;
-            if (rarity == 5) star = 20; 
-            else if (rarity == 4) star = 8;
-            else dirt = 20;
-
-            GachaData.GachaHistory.Add(new GachaInfo { GachaId = bannerId, ItemId = item, Time = DateTimeOffset.UtcNow.ToUnixTimeSeconds() });
-
-            // --- 【补全逻辑】处理物品入库与转换 ---
-            if (GameData.ItemConfigData[item].ItemMainType == ItemMainTypeEnum.AvatarCard)
+            var avatar = Player.AvatarManager?.GetFormalAvatar(item);
+            if (avatar == null)
             {
-                var avatar = Player.AvatarManager?.GetFormalAvatar(item);
-                if (avatar == null)
-                {
-                    // 初次获得角色
-                    await Player.AvatarManager!.AddAvatar(item, isGacha: true);
-                    // 发放头像 (200000 偏移)
-                    await Player.InventoryManager.AddItem(200000 + item, 1, false, sync: false);
-                    UpdateSyncList(syncItems, 200000 + item);
-                }
-                else
-                {
-                    // 重复获得角色 -> 转化为星魂
-                    var rankUpItemId = item + 10000;
-                    var rankUpItemCount = Player.InventoryManager!.GetItemCount(rankUpItemId);
-                    
-                    // 检查是否达到 6 魂 (星魂数 + 当前命座 >= 6)
-                    bool isFullRank = avatar.PathInfos[item].Rank + rankUpItemCount >= 6;
-
-                    if (isFullRank)
-                    {
-                        // 满魂转化：增加额外星芒奖励
-                        star += (rarity == 5) ? 60 : 12;
-                        // 2. 【核心修复】：只有 5 星满魂才额外给 281
-						if (rarity == 5)
-						{
-						await Player.InventoryManager.AddItem(281, 1, false, sync: false);
-						UpdateSyncList(syncItems, 281);
-						gachaItem.TransferItemList.ItemList_.Add(new Item { ItemId = 281, Num = 1 });
-						}
-                    }
-                    else
-                    {
-                        // 未满魂：发放星魂入库
-                        await Player.InventoryManager.AddItem(rankUpItemId, 1, false, sync: false);
-                        UpdateSyncList(syncItems, rankUpItemId);
-                        gachaItem.TransferItemList.ItemList_.Add(new Item { ItemId = (uint)rankUpItemId, Num = 1 });
-                    }
-                }
+                await Player.AvatarManager!.AddAvatar(item, isGacha: true);
+                var headIcon = await Player.InventoryManager.AddItem(200000 + item, 1, false, sync: false, returnRaw: true);
+                if (headIcon != null) syncMap[(200000 + item).ToString()] = headIcon;
             }
             else
             {
-                // 武器直接发放
-                await Player.InventoryManager.AddItem(item, 1, false, sync: false);
-            }
+                var rankUpItemId = item + 10000;
+                var rankUpItem = await Player.InventoryManager.AddItem(rankUpItemId, 1, false, sync: false, returnRaw: true);
+                if (rankUpItem != null) syncMap[rankUpItemId.ToString()] = rankUpItem;
+                gItem.TransferItemList.ItemList_.Add(new Item { ItemId = (uint)rankUpItemId, Num = 1 });
 
-            // D. 发放副产物并构造同步列表
-            if (star > 0)
-            {
-                await Player.InventoryManager.AddItem(252, star, false, sync: false);
-                gachaItem.TokenItem ??= new ItemList();
-                gachaItem.TokenItem.ItemList_.Add(new Item { ItemId = 252, Num = (uint)star });
-                UpdateSyncList(syncItems, 252);
+                if (avatar.PathInfos[item].Rank + (rankUpItem?.Count ?? 0) >= 6)
+                {
+                    star += (rarity == 5) ? 60 : 12;
+                    if (rarity == 5)
+                    {
+                        var rareItem = await Player.InventoryManager.AddItem(281, 1, false, sync: false, returnRaw: true);
+                        if (rareItem != null) syncMap["281"] = rareItem;
+                        gItem.TransferItemList.ItemList_.Add(new Item { ItemId = 281, Num = 1 });
+                    }
+                }
             }
-            if (dirt > 0)
+        }
+        else
+        {
+            // B. 光锥入库：【修复关键】必须获取 returnRaw 拿到 UniqueId
+            var weapon = await Player.InventoryManager.AddItem(item, 1, false, sync: false, returnRaw: true);
+            if (weapon != null)
             {
-                await Player.InventoryManager.AddItem(251, dirt, false, sync: false);
-                gachaItem.TokenItem ??= new ItemList();
-                gachaItem.TokenItem.ItemList_.Add(new Item { ItemId = 251, Num = (uint)dirt });
-                UpdateSyncList(syncItems, 251);
+                // 武器是唯一物品，必须用 UniqueId 作为标识符放入同步列表
+                syncMap[$"weapon_{weapon.UniqueId}"] = weapon; 
             }
-
-            UpdateSyncList(syncItems, item);
-            gachaItems.Add(gachaItem);
-			Console.WriteLine($"[GACHA_DEBUG] 抽卡后数据库状态 -> NewbieGachaCount: {GachaData.NewbieGachaCount}");
         }
 
-        // 5. 统一同步包
-        await Player.SendPacket(new PacketPlayerSyncScNotify(syncItems));
+        // C. 发放副产物
+        if (star > 0)
+        {
+            var sItem = await Player.InventoryManager.AddItem(252, star, false, sync: false, returnRaw: true);
+            if (sItem != null) syncMap["252"] = sItem;
+            gItem.TokenItem ??= new ItemList { ItemList_ = { new Item { ItemId = 252, Num = (uint)star } } };
+        }
+        if (dirt > 0)
+        {
+            var dItem = await Player.InventoryManager.AddItem(251, dirt, false, sync: false, returnRaw: true);
+            if (dItem != null) syncMap["251"] = dItem;
+            gItem.TokenItem ??= new ItemList { ItemList_ = { new Item { ItemId = 251, Num = (uint)dirt } } };
+        }
 
-        // 6. 构造回包
-        var proto = new DoGachaScRsp  
-        {  
-            GachaId = (uint)bannerId,  
-            GachaNum = (uint)times,
-            Retcode = 0,
-            GDIFAAHIFBH = (uint)GachaData.NewbieGachaCount,
-            CeilingNum = (uint)GachaData.StandardCumulativeCount,
-			PENILHGLHHM = (uint)GachaData.StandardCumulativeCount,	
-            //KMNJNMJFGBG = (uint)GachaData.NewbieGachaCount
-        };
-        proto.GachaItemList.AddRange(gachaItems);
-
-        //if (bannerId == 1001 || bannerId == 4001)
-        //{
-        //    await Player.SendPacket(new EggLink.DanhengServer.GameServer.Server.Packet.Send.Gacha.PacketGetGachaInfoScRsp(Player));
-        //}
-
-        return proto;
+        gachaItems.Add(gItem);
     }
 
-    // 辅助方法：更新同步列表中的总量
-    private void UpdateSyncList(List<ItemData> list, int itemId)
-    {
-        var existing = list.Find(x => x.ItemId == itemId);
-        int count = (int)Player.InventoryManager!.GetItemCount(itemId);
-        if (existing == null) list.Add(new ItemData { ItemId = itemId, Count = count });
-        else existing.Count = count;
-    }
+    // 5. 【终极同步】一次性发送所有更新过的数据包
+    // 包含：扣费、所有抽到的武器(带UniqueId)、增加后的材料总量
+    await Player.SendPacket(new PacketPlayerSyncScNotify(syncMap.Values.ToList()));
+
+    // 6. 构造回包
+    var proto = new DoGachaScRsp {
+        GachaId = (uint)bannerId,
+        GachaNum = (uint)times,
+        Retcode = 0,
+        GDIFAAHIFBH = (uint)GachaData.NewbieGachaCount,
+        CeilingNum = (uint)GachaData.StandardCumulativeCount,
+        PENILHGLHHM = (uint)GachaData.StandardCumulativeCount
+    };
+    proto.GachaItemList.AddRange(gachaItems);
+
+    return proto;
+}
 
   
     
