@@ -12,32 +12,43 @@ namespace EggLink.DanhengServer.GameServer.Server.Packet.Recv.Activity;
 [Opcode(CmdIds.TakeTrialActivityRewardCsReq)]
 public class HandlerTakeTrialActivityRewardCsReq : Handler
 {
-    public override async Task OnHandle(Connection connection, byte[] header, byte[] data)
+ public override async Task OnHandle(Connection connection, byte[] header, byte[] data)
     {
         var req = TakeTrialActivityRewardCsReq.Parser.ParseFrom(data);
+        var player = connection.Player!;
 
         GameData.AvatarDemoConfigData.TryGetValue((int)req.StageId, out var stage);
         if (stage != null)
         {
             GameData.RewardDataData.TryGetValue(stage.RewardID, out var reward);
             var itemList = new List<ItemData>();
-            reward?.GetItems().ForEach(i =>
+
+            var rewardItems = reward?.GetItems() ?? new List<(int, int)>();
+            foreach (var i in rewardItems)
             {
-                var res = connection.Player!.InventoryManager!.AddItem(i.Item1, i.Item2, false).Result;
+                // 修改点：将 sync 设为 false。
+                // 这样 AddItem 内部就不会去加 Hcoin，也不会重复发同步包。
+                var res = await player.InventoryManager!.AddItem(i.Item1, i.Item2, false, sync: false);
                 if (res != null) itemList.Add(res);
-            });
-            var activities = connection.Player!.ActivityManager!.Data.TrialActivityData.Activities;
-            var activity = activities.Find(x => x.StageId == req.StageId);
-            if (activity != null)
-                activities[activities.FindIndex(x => x.StageId == req.StageId)] = new TrialActivityResultData
+            }
+
+            var activities = player.ActivityManager!.Data.TrialActivityData.Activities;
+            var activityIndex = activities.FindIndex(x => x.StageId == req.StageId);
+            if (activityIndex != -1)
+            {
+                activities[activityIndex] = new TrialActivityResultData
                 {
                     StageId = (int)req.StageId,
                     TakenReward = true
                 };
-            connection.Player!.Data.Hcoin += reward!.Hcoin;
+            }
 
-            await connection.Player!.SendPacket(new PacketPlayerSyncScNotify(connection.Player!.ToProto(), itemList));
-            await connection.Player!.SendPacket(new PacketScenePlaneEventScNotify(itemList));
+            // 保留此行：现在你可以安全地在这里手动加钱，不会翻倍了。
+            player.Data.Hcoin += reward!.Hcoin; 
+
+            // 保留所有原始发包逻辑
+            await player.SendPacket(new PacketPlayerSyncScNotify(player.ToProto(), itemList));
+            await player.SendPacket(new PacketScenePlaneEventScNotify(itemList));
             await connection.SendPacket(new PacketTakeTrialActivityRewardScRsp(req.StageId, itemList));
         }
     }
