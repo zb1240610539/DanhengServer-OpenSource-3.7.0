@@ -281,18 +281,18 @@ private List<ItemData> GenerateWorldRelicRewards(int worldIndex, int difficulty)
         }
     }
 
-   private int[] GetWorldRelicSets(int worldIndex)
+  private int[] GetWorldRelicSets(int worldIndex)
 {
-    // worldIndex 通常是 (currentAreaId - 100) / 10
-    // 例如：Area 130 -> worldIndex 3
     return worldIndex switch
     {
-        3 => [301, 302], // 3015/3016 (黑塔), 3025/3026 (仙舟)
-        4 => [307, 308], // 3075 (公司), 3085 (翁瓦克)
-        5 => [303, 305], // 3035 (贸易), 3055 (螺丝)
-        6 => [306, 304], // 3065 (萨尔索图), 3045 (贝洛伯格)
-        9 => [314, 313], // 3145 (出云), 3135 (茨冈尼亚)
-        _ => [301, 302]
+        3 => [301, 302], // 太空封印站, 不老者的仙舟
+        4 => [307, 308], // 盗贼公国, 翁瓦克
+        5 => [303, 305], // 泛银河公司, 星体差分机
+        6 => [304, 306], // 筑城者, 停转的萨尔索图
+        7 => [309, 310], // 繁星竞技场, 折断的龙骨
+        8 => [311, 312], // 苍穹战线, 梦想之地
+        9 => [313, 314], // 无主荒星, 出云显世
+        _ => [301, 302]  // 默认给世界3
     };
 }
 	// --- 【新增 UpdateRogueProgress 方法】 ---
