@@ -581,8 +581,8 @@ foreach (var kvp in totalCountMap)
         // 3. 将单个对象加入列表，而不是加入整个集合
         resItems.Add(displayItem);
     }
-}
-
+	}
+await Player.SendPacket(new PacketPlayerSyncScNotify(resItems));
 // 别忘了最后返回列表
 return resItems;
 }	   
