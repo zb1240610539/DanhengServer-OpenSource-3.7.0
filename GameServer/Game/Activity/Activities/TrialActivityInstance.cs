@@ -32,24 +32,38 @@ public class TrialActivityInstance : BaseActivityInstance
     }
 
     public async ValueTask EndActivity(TrialActivityStatus status = TrialActivityStatus.None)
+{
+    var player = ActivityManager.Player!;
+
+    // 基础逻辑：清理阵容、切场景
+    await player.LineupManager!.DestroyExtraLineup(ExtraLineupType.LineupStageTrial);
+    player.LineupManager!.LineupData.CurExtraLineup = -1;
+    await player.EnterScene(2000101, 0, true);
+
+    if (status == TrialActivityStatus.Finish)
     {
-        var player = ActivityManager.Player!;
-
-        // Remove trial lineup
-        await player.LineupManager!.DestroyExtraLineup(ExtraLineupType.LineupStageTrial);
-        player.LineupManager!.LineupData.CurExtraLineup = -1;
-
-        // Go back to default scene
-        await player.EnterScene(2000101, 0, true);
-        if (status == TrialActivityStatus.Finish)
+        // 1. 更新内存 (对应签到的 loginData.LoginDays++)
+        Data.Activities.Add(new TrialActivityResultData
         {
-            Data.Activities.Add(new TrialActivityResultData
-            {
-                StageId = Data.CurTrialStageId
-            });
-            await player.SendPacket(new PacketCurTrialActivityScNotify((uint)Data.CurTrialStageId, status));
-        }
+            StageId = Data.CurTrialStageId
+        });
 
-        Data.CurTrialStageId = 0;
+        // 2. 标记保存 (完全模仿签到的 Save() 逻辑)
+        // 这会让 DatabaseHelper 在下一个周期把数据存进 SQL
+        var saveMethod = ActivityManager.GetType().GetMethod("Save", 
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        saveMethod?.Invoke(ActivityManager, null);
+
+        // 3. 发送表现通知
+        await player.SendPacket(new PacketCurTrialActivityScNotify((uint)Data.CurTrialStageId, status));
+
+        // 4. 【核心模仿点】立即同步数据包
+        // 签到是随 Rsp 返回，试用由于是战斗结束，我们主动 Push 一个 Rsp 给它
+        await ActivityManager.SyncTrialActivity();
+        
+        LogDebug($"[试用修复] 关卡 {Data.CurTrialStageId} 完成，已模仿签到逻辑同步全量数据");
     }
+
+    Data.CurTrialStageId = 0;
+}
 }
