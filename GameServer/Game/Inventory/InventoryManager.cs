@@ -340,16 +340,24 @@ public class InventoryManager(PlayerInstance player) : BasePlayerManager(player)
             case ItemMainTypeEnum.Equipment:
                 var equipment = Data.EquipmentItems.Find(x => x.UniqueId == uniqueId);
                 if (equipment == null) return null;
-                Data.EquipmentItems.Remove(equipment);
-                itemData = equipment;
+				// --- 核心修改 ---
+    			itemData = equipment.Clone(); // 获取快照
+    			itemData.Count = 0;          // 强制设为 0，告诉 UI 销毁该格子
+    
+    			Data.EquipmentItems.Remove(equipment);
+               
+                
                 break;
 
             // 4. 处理遗器
             case ItemMainTypeEnum.Relic:
                 var relic = Data.RelicItems.Find(x => x.UniqueId == uniqueId);
                 if (relic == null) return null;
+               
+				// --- 核心修改 ---
+    			itemData = relic.Clone(); 
+    			itemData.Count = 0;          // 强制设为 0
                 Data.RelicItems.Remove(relic);
-                itemData = relic;
                 break;
         }
 
