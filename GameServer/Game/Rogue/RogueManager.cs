@@ -515,7 +515,7 @@ private void SaveUnlockedAeon(int aeonId)
     return proto;
 }
 
-    public static RogueAeonInfo ToAeonInfo()
+    public RogueAeonInfo ToAeonInfo()
     {   var unlockedIds = GetUnlockedAeonIds(); // 获取玩家自己的解锁数据
         var proto = new RogueAeonInfo
         {
