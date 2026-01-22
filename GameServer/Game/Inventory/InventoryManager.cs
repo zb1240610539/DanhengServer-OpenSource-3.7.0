@@ -1195,37 +1195,49 @@ public class InventoryManager(PlayerInstance player) : BasePlayerManager(player)
         return [.. list.Values];
     }
 
-    public async ValueTask<bool> PromoteAvatar(int avatarId)
-    {
-        // Get avatar
-        var avatarData = Player.AvatarManager!.GetFormalAvatar(avatarId);
-        if (avatarData == null) return false;
+   public async ValueTask<bool> PromoteAvatar(int avatarId)
+{
+    // 1. 获取角色与配置
+    var avatarData = Player.AvatarManager!.GetFormalAvatar(avatarId);
+    if (avatarData == null) return false;
 
-        GameData.AvatarConfigData.TryGetValue(avatarId, out var avatarConfig);
-        if (avatarConfig == null ||
-            avatarData.Promotion >= avatarConfig.MaxPromotion) return false;
+    GameData.AvatarConfigData.TryGetValue(avatarId, out var avatarConfig);
+    if (avatarConfig == null || avatarData.Promotion >= avatarConfig.MaxPromotion) return false;
 
-        // Get promotion data
-        var promotion =
-            GameData.AvatarPromotionConfigData.Values.FirstOrDefault(x =>
-                x.AvatarID == avatarId && x.Promotion == avatarData.Promotion)!;
+    // 2. 获取晋阶消耗数据
+    var promotion = GameData.AvatarPromotionConfigData.Values.FirstOrDefault(x =>
+        x.AvatarID == avatarId && x.Promotion == avatarData.Promotion)!;
 
-        // Sanity check
-        if (avatarData.Level < promotion.MaxLevel ||
-            Player.Data.Level < promotion.PlayerLevelRequire ||
-            Player.Data.WorldLevel < promotion.WorldLevelRequire) return false;
+    // 3. 前置条件判定 (等级、均衡等级等)
+    if (avatarData.Level < promotion.MaxLevel ||
+        Player.Data.Level < promotion.PlayerLevelRequire ||
+        Player.Data.WorldLevel < promotion.WorldLevelRequire) return false;
 
-        // Pay items
-        foreach (var cost in promotion.PromotionCostList)
-            await Player.InventoryManager!.RemoveItem(cost.ItemID, cost.ItemNum);
+    // 4. 【核心优化】：构造批量扣除列表
+    // 准备 (itemId, count, uniqueId) 格式的列表
+    var costItems = promotion.PromotionCostList
+        .Select(cost => (cost.ItemID, cost.ItemNum, 0))
+        .ToList();
 
-        // Promote
-        avatarData.Promotion += 1;
+    // 5. 【核心优化】：调用批量扣除
+    // 使用 RemoveItems 内部的 sync: true 逻辑，它会自动把这几种材料打包成一个 PacketPlayerSyncScNotify 发出
+    var removed = await Player.InventoryManager!.RemoveItems(costItems, sync: true);
+    
+    // 如果扣除失败（例如数量不够），直接返回
+    if (removed.Count < costItems.Count) return false; 
 
-        // Send packets
-        await Player.SendPacket(new PacketPlayerSyncScNotify(avatarData));
-        return true;
-    }
+    // 6. 执行晋阶
+    avatarData.Promotion += 1;
+
+    // 7. 同步角色状态（告诉客户端：晋阶成功，等级上限提升了）
+    // 注意：这里的 avatarData 是总量同步
+    await Player.SendPacket(new PacketPlayerSyncScNotify(avatarData));
+    
+    // 8. 存盘 (可选，建议在此处确保数据持久化)
+    // DatabaseHelper.UpdateInstance(avatarData); 
+
+    return true;
+}
 
     public async ValueTask<bool> PromoteEquipment(int equipmentUniqueId)
     {
