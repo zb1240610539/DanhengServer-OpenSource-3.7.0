@@ -50,7 +50,12 @@ public class PlayerData : BaseDatabaseDataHelper
     /// 沉浸器数量 (ID 33)
     /// </summary>
     public int ImmersiveArtifact { get; set; } = 0;
-
+	/// <summary>
+    /// 已解锁的命途 ID 列表 (如 "1,2,7")
+    /// 默认值可以设为 "1"，代表初始解锁存护
+    /// </summary>
+    [SugarColumn(ColumnDataType = "TEXT", IsNullable = true)]
+    public string UnlockedAeonIds { get; set; } = "1";
     /// <summary>
     /// 已解锁的合成配方 ID 列表
     /// 使用 SqlSugar 的 IsJson 标签将其在数据库中存为字符串
