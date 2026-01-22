@@ -20,33 +20,50 @@ public class RogueBuffSelectMenu(BaseRogueInstance rogue)
     public List<BaseRogueBuffExcel> BuffPool { get; set; } = [];
 
     public void RollBuff(List<BaseRogueBuffExcel> buffs, int count = 3)
+	{
+    BuffPool.Clear();
+    BuffPool.AddRange(buffs);
+
+    var list = new RandomList<BaseRogueBuffExcel>();
+
+    // --- 第一步：过滤 ---
+    // 找出池子中属于当前命途的祝福
+    var pathSpecificBuffs = buffs.Where(b => b.RogueBuffType == rogue.RogueBuffType).ToList();
+
+    // --- 第二步：权重分配 ---
+    if (pathSpecificBuffs.Count > 0)
     {
-        BuffPool.Clear();
-        BuffPool.AddRange(buffs);
-
-        var list = new RandomList<BaseRogueBuffExcel>();
-
-        foreach (var buff in buffs)
-            if (buff.RogueBuffType == rogue.RogueBuffType)
-                list.Add(buff, 20);
-            else
-                list.Add(buff, 15);
-        var result = new List<BaseRogueBuffExcel>();
-
-        for (var i = 0; i < count; i++)
+        // 如果有本命途祝福，只把它们加入随机列表
+        foreach (var buff in pathSpecificBuffs)
         {
-            var buff = list.GetRandom();
-            if (buff != null)
-            {
-                result.Add(buff);
-                list.Remove(buff);
-            }
+            list.Add(buff, 20); // 保留你的 20 权重
+        }
+    }
+    else
+    {
+        // 只有在本命途祝福全被抽完的情况下，才开放其他命途
+        foreach (var buff in buffs)
+        {
+            list.Add(buff, 15); // 保留你的 15 权重
+        }
+    }
 
-            if (list.GetCount() == 0) break; // No more buffs to roll
+    // --- 第三步：抽取 ---
+    var result = new List<BaseRogueBuffExcel>();
+    for (var i = 0; i < count; i++)
+    {
+        var buff = list.GetRandom();
+        if (buff != null)
+        {
+            result.Add(buff);
+            list.Remove(buff);
         }
 
-        Buffs = result;
+        if (list.GetCount() == 0) break; 
     }
+
+    Buffs = result;
+}
 
     public async ValueTask RerollBuff()
     {
