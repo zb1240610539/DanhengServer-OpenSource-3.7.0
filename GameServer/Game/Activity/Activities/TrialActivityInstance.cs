@@ -61,7 +61,7 @@ public class TrialActivityInstance : BaseActivityInstance
         // 签到是随 Rsp 返回，试用由于是战斗结束，我们主动 Push 一个 Rsp 给它
         await ActivityManager.SyncTrialActivity();
         
-        LogDebug($"[试用修复] 关卡 {Data.CurTrialStageId} 完成，已模仿签到逻辑同步全量数据");
+        
     }
 
     Data.CurTrialStageId = 0;
