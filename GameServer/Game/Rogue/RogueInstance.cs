@@ -338,38 +338,8 @@ public class RogueInstance : BaseRogueInstance
         battle.CustomLevel = baseLevel + addLevel;
 
         Console.WriteLine($"[RogueLevel] 战斗等级修正 -> 推荐:{baseLevel} 层数:{CurReachedRoom}(原SiteId:{CurRoom.SiteId}) 加成:{addLevel} 最终:{battle.CustomLevel}");
-
-        // =========================================================
-        // 【BOSS 数据注入逻辑】(保持不变)
-        // =========================================================
-        bool isBossStage = CurRoom.Excel.RogueRoomType == 7 || CurRoom.SiteId == 13 || CurRoom.SiteId == 111 || CurRoom.SiteId == 112;
-
-        if (isBossStage) 
-        {
-            int worldIndex = (AreaExcel.RogueAreaID / 10) % 10;
-            int difficulty = AreaExcel.Difficulty;
-            if (difficulty == 0) difficulty = 1;
-
-            int targetStageId = 80300000 + (worldIndex * 10) + difficulty;
-            if (worldIndex == 3) targetStageId = 80139011;
-            if (worldIndex == 4) targetStageId = 80149011;
-			if (worldIndex == 5) targetStageId = 80159011;
-			if (worldIndex == 6) targetStageId = 80169011;
-			if (worldIndex == 7) targetStageId = 80179011;
-			if (worldIndex == 8) targetStageId = 80189011;
-			if (worldIndex == 9) targetStageId = 80199011;
-
-            if (targetStageId > 0 && GameData.StageConfigData.TryGetValue(targetStageId, out var stageConfig))
-            {
-                battle.StageId = targetStageId;
-                if (battle.Stages != null)
-                {
-                    battle.Stages.Clear(); 
-                    battle.Stages.Add(stageConfig); 
-                }
-            }
-        }
-    }
+		}
+       
 
     // =========================================================================
     // 【修改后】OnBattleEnd 彻底“静音”
