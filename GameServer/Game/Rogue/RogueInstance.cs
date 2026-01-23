@@ -43,7 +43,7 @@ public class RogueInstance : BaseRogueInstance
             foreach (var item in mapRooms.Values)
             {
                 var roomInstance = new RogueRoomInstance(item, areaExcel);
-                roomInstance.MapId = mapId; 
+                
 
                 RogueRooms.Add(item.SiteID, roomInstance);
                 if (item.IsStart) StartSiteId = item.SiteID;
@@ -228,15 +228,36 @@ public class RogueInstance : BaseRogueInstance
         }
     }
     
-    private int GetMapIdFromAreaId(int areaId)
+  private int GetMapIdFromAreaId(int areaId)
+{
+    // 1. 特殊处理：新手教程或极短关卡
+    if (areaId == 100) return 1; 
+    
+    // 2. 特殊处理：世界 1 和 世界 2 (使用 7 关长度的地图)
+    if (areaId == 110) return 3; 
+	if (areaId == 120) return 200; 
+
+    // 3. 标准世界映射 (世界 3 - 世界 9)
+    // 逻辑：(RogueAreaID 的十位) * 100 + (RogueAreaID 的个位)
+    // 例如：131 (世界3难度2) -> 301
+    // 例如：142 (世界4难度3) -> 402
+    if (areaId >= 130 && areaId < 200)
     {
-        if (areaId == 100) return 1;
-        if (areaId == 110) return 3;
-        if (areaId == 120) return 3;
-        if (areaId >= 130 && areaId < 200) return 200; 
-        if (areaId >= 10100) return 10001; 
-        return 1;
+        int worldNum = (areaId / 10) % 10;
+        int difficultyIndex = areaId % 10;
+        return worldNum * 100 + difficultyIndex;
     }
+
+    // 4. 活动/DLC 关卡映射 (10100 系列)
+    // 例如：10100 -> 10001
+    if (areaId >= 10100)
+    {
+        return 10000 + (areaId % 10) + 1;
+    }
+
+    // 兜底返回
+    return 200; 
+}
 
     public override async ValueTask UpdateMenu(int position = 0)
     {
@@ -386,18 +407,27 @@ public class RogueInstance : BaseRogueInstance
         return proto;
     }
 
-    public RogueMapInfo ToMapInfo()
+	RogueMapInfo ToMapInfo()
+	{
+    // 逻辑：
+    // 1. 如果有当前房间，直接拿房间里配置好的物理场景 ID (MapId)
+    // 2. 如果没进房，拿第一个房源（起点房）里配好的物理场景 ID
+    // 3. 实在没有，才用 GetMapIdFromAreaId 那个骨架 ID 兜底（但这基本不会发生）
+    
+
+    var proto = new RogueMapInfo
     {
-        var proto = new RogueMapInfo
-        {
-            CurSiteId = (uint)(CurRoom?.SiteId ?? StartSiteId),
-            CurRoomId = (uint)(CurRoom?.RoomId ?? 0),
-            AreaId = (uint)AreaExcel.RogueAreaID,
-            MapId = (uint)(CurRoom?.MapId ?? GetMapIdFromAreaId(AreaExcel.RogueAreaID))
-        };
-        foreach (var room in RogueRooms) proto.RoomList.Add(room.Value.ToProto());
-        return proto;
-    }
+        CurSiteId = (uint)(CurRoom?.SiteId ?? StartSiteId),
+        CurRoomId = (uint)(CurRoom?.RoomId ?? 0),
+        AreaId = (uint)AreaExcel.RogueAreaID,
+        
+        // 发给客户端这个 realMapId，它才会去加载杰帕德的场景
+        MapId = (uint)GetMapIdFromAreaId(AreaExcel.RogueAreaID) 
+    };
+    
+    foreach (var room in RogueRooms) proto.RoomList.Add(room.Value.ToProto());
+    return proto;
+}
     
     public GameAeonInfo ToAeonInfo()
     {
