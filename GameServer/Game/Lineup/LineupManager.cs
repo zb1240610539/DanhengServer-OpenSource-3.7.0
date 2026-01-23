@@ -71,6 +71,12 @@ public class LineupManager : BasePlayerManager
             else if (avatar.AssistUid > 0)
             {
                 var avatarStorage = DatabaseHelper.Instance?.GetInstance<AvatarData>(avatar.AssistUid);
+                // 2. 【核心修改】如果玩家不在线（缓存为空），直接从数据库读取
+    			if (avatarStorage == null)
+    			{
+        		// 使用 SqlSugar 直接查询数据库中的 AvatarData 表
+        		avatarStorage = DatabaseHelper.Instance?.GetFromDatabase<AvatarData>(avatar.AssistUid);
+    			}
                 avatarType = AvatarType.AvatarAssistType;
                 if (avatarStorage == null) continue;
                 foreach (var avatarData in avatarStorage.FormalAvatars.Where(avatarData =>
