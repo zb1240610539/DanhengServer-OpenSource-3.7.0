@@ -191,7 +191,33 @@ public class LineupManager : BasePlayerManager
         LineupData.Lineups.Add(index, lineup);
         LineupData.CurExtraLineup = index;
     }
+	// 新增重载：直接接收完整的 LineupAvatarInfo 列表
+	public void SetExtraLineup(ExtraLineupType type, List<LineupAvatarInfo> avatarInfos)
+	{
+    if (type == ExtraLineupType.LineupNone)
+    {
+        LineupData.CurExtraLineup = -1;
+        return;
+    }
 
+    var index = (int)type + 10;
+
+    // 销毁旧编队
+    LineupData.Lineups.Remove(index);
+
+    // 创建新编队并直接赋值列表（保留了 AssistUid）
+    var lineup = new LineupInfo
+    {
+        Name = "",
+        LineupType = (int)type,
+        BaseAvatars = avatarInfos, // 直接透传，不丢失数据
+        LineupData = LineupData,
+        AvatarData = Player.AvatarManager!.AvatarData
+    };
+
+    LineupData.Lineups.Add(index, lineup);
+    LineupData.CurExtraLineup = index;
+	}
     public async ValueTask SetExtraLineup(ExtraLineupType type, bool notify = true)
     {
         if (type == ExtraLineupType.LineupNone)
