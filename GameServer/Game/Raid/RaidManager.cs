@@ -8,7 +8,7 @@ using EggLink.DanhengServer.GameServer.Server.Packet.Send.Lineup;
 using EggLink.DanhengServer.GameServer.Server.Packet.Send.Raid;
 using EggLink.DanhengServer.Proto;
 using RaidData = EggLink.DanhengServer.Database.Scene.RaidData;
-
+using EggLink.DanhengServer.Database.Lineup;
 namespace EggLink.DanhengServer.GameServer.Game.Raid;
 
 public class RaidManager : BasePlayerManager
