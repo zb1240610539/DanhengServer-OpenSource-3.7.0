@@ -27,12 +27,7 @@ public class HandlerTakeTrialActivityRewardCsReq : Handler
         // 3. 构造奖励列表 (手动创建用于显示的列表)
         var rewardItems = reward.GetItems().Select(x => new ItemData { ItemId = x.Item1, Count = x.Item2 }).ToList();
         
-        // 如果包含星琼，加入列表。AddItems 内部会处理 Player.Data.Hcoin 的逻辑
-        if (reward.Hcoin > 0)
-        {
-            rewardItems.Add(new ItemData { ItemId = 1, Count = (int)reward.Hcoin });
-        }
-
+       
         // 4. 执行批量添加
         // 修复 CS0815：不再尝试接收 AddItems 的返回值，因为它返回的是 ValueTask (void)
         await player.InventoryManager!.AddItems(rewardItems, notify: true);
@@ -49,9 +44,7 @@ public class HandlerTakeTrialActivityRewardCsReq : Handler
             };
         }
 
-        // 6. 标记数据库持久化
-        if (!DatabaseHelper.ToSaveUidList.Contains(player.Uid))
-            DatabaseHelper.ToSaveUidList.Add(player.Uid);
+        
 
         // 7. 同步玩家属性 (刷新星琼顶栏)
         // 因为 AddItems 内部对虚拟物品使用静默模式，这里必须补发全量包
