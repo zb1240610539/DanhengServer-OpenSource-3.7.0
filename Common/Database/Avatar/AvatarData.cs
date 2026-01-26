@@ -197,23 +197,62 @@ public class FormalAvatarInfo : BaseAvatarInfo
 
     #region Battle Proto
 
-    public override BattleAvatar ToBattleProto(PlayerDataCollection collection, AvatarType avatarType = AvatarType.AvatarFormalType)
+   public override BattleAvatar ToBattleProto(PlayerDataCollection collection, AvatarType avatarType = AvatarType.AvatarFormalType)
+{
+    // --- 1. 等级压制预处理 ---
+    uint correctedLevel = (uint)Level;
+    uint correctedPromotion = (uint)Promotion;
+
+    if (avatarType == AvatarType.AvatarAssistType)
     {
-        var proto = CreateBaseProto(collection, avatarType);
-        var isUpgradable = IsUpgradableType(avatarType);
+        // 获取当前借人玩家的均衡等级 (0-6)
+        int playerWorldLevel = collection.PlayerData.WorldLevel;
 
-        if (!GameData.AvatarConfigData.TryGetValue(AvatarId, out var avatarConf))
-            return proto;
-
-        if (isUpgradable)
-            ApplyMaxLevel(proto);
-
-        ProcessSkills(proto, isUpgradable);
-        ProcessRelics(proto, collection, isUpgradable);
-        ProcessEquipment(proto, collection, isUpgradable, avatarConf);
-
-        return proto;
+        // 根据均衡等级，从配置表里查这个角色在当前位面的最高上限
+        if (GameData.AvatarPromotionConfigData.TryGetValue(BaseAvatarId * 10 + playerWorldLevel, out var config))
+        {
+            if (correctedLevel > (uint)config.MaxLevel)
+            {
+                correctedLevel = (uint)config.MaxLevel;
+                correctedPromotion = (uint)playerWorldLevel;
+            }
+        }
     }
+
+    // --- 2. 构造基础 Proto ---
+    var proto = CreateBaseProto(collection, avatarType);
+    
+    // 覆盖为压制后的等级
+    proto.Level = correctedLevel;
+    proto.Promotion = correctedPromotion;
+
+    var isUpgradable = IsUpgradableType(avatarType);
+    if (!GameData.AvatarConfigData.TryGetValue(AvatarId, out var avatarConf))
+        return proto;
+
+    if (isUpgradable) ApplyMaxLevel(proto);
+
+    // --- 3. 技能处理 (传入 correctedPromotion 进行压制) ---
+    foreach (var (skillId, level) in GetCurPathInfo().GetSkillTree())
+    {
+        var finalLevel = isUpgradable ? GetUpgradedSkillLevel(skillId, level) : level;
+
+        // 助战技能压制：防止 20 级角色放 10 级大招导致数据异常
+        if (avatarType == AvatarType.AvatarAssistType)
+        {
+            uint skillCap = correctedPromotion + 3; // 经验公式：晋阶+3
+            if (finalLevel > (int)skillCap) finalLevel = (int)skillCap;
+        }
+
+        proto.SkilltreeList.Add(new AvatarSkillTree { PointId = (uint)skillId, Level = (uint)finalLevel });
+    }
+
+    // --- 4. 遗器与光锥 (透传 collection.InventoryData) ---
+    ProcessRelics(proto, collection, isUpgradable);
+    ProcessEquipment(proto, collection, isUpgradable, avatarConf);
+
+    return proto;
+}
 
     private BattleAvatar CreateBaseProto(PlayerDataCollection collection, AvatarType avatarType)
     {
