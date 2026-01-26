@@ -1,6 +1,7 @@
 ﻿using EggLink.DanhengServer.GameServer.Server.Packet.Send.Friend;
 using EggLink.DanhengServer.Kcp;
-
+using EggLink.DanhengServer.Proto; // 修复 CS0246：引入 Proto 命名空间
+using EggLink.DanhengServer.GameServer.Server;
 namespace EggLink.DanhengServer.GameServer.Server.Packet.Recv.Friend;
 
 [Opcode(CmdIds.GetAssistListCsReq)]
