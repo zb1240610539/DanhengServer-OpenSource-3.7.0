@@ -282,11 +282,18 @@ public class FormalAvatarInfo : BaseAvatarInfo
         proto.Promotion = 6;
     }
 
-    private void ProcessSkills(BattleAvatar proto, bool isUpgradable)
+    private void ProcessSkills(BattleAvatar proto, bool isUpgradable, uint correctedPromotion, AvatarType avatarType)
     {
         foreach (var (skillId, level) in GetCurPathInfo().GetSkillTree())
         {
             var finalLevel = isUpgradable ? GetUpgradedSkillLevel(skillId, level) : level;
+
+            // 如果是助战，执行技能等级压制 (晋阶 + 3 左右是安全阈值)
+            if (avatarType == AvatarType.AvatarAssistType)
+            {
+                uint skillCap = correctedPromotion + 3;
+                if (finalLevel > (int)skillCap) finalLevel = (int)skillCap;
+            }
 
             proto.SkilltreeList.Add(new AvatarSkillTree
             {
