@@ -133,30 +133,34 @@ public class BattleInstance(PlayerInstance player, LineupInfo lineup, List<Stage
         value.BattleTargetList_.Add(battleTarget);
     }
 
-    public List<AvatarLineupData> GetBattleAvatars()
+  public List<AvatarLineupData> GetBattleAvatars()
     {
+        // 1. 优先处理试用关卡、战斗学院等特殊 Stage 的固定阵容
         var excel = GameData.StageConfigData[StageId];
         List<int> list = [.. excel.TrialAvatarList];
 
-        // if college excel is not null
-        if (CollegeConfigExcel is { TrialAvatarList.Count: > 0 }) list = [.. CollegeConfigExcel.TrialAvatarList];
+        // 如果战斗学院配置不为空，覆盖阵容
+        if (CollegeConfigExcel is { TrialAvatarList.Count: > 0 }) 
+            list = [.. CollegeConfigExcel.TrialAvatarList];
 
         if (list.Count > 0)
         {
             List<int> tempList = [.. list];
+            // 根据主角性别移除不匹配的开拓者 ID
             if (Player.Data.CurrentGender == Gender.Man)
                 foreach (var avatar in tempList.Where(avatar =>
-                             GameData.SpecialAvatarData.TryGetValue(avatar * 10 + 0, out var specialAvatarExcel) &&
-                             specialAvatarExcel.AvatarID is 8002 or 8004 or 8006))
+                                 GameData.SpecialAvatarData.TryGetValue(avatar * 10 + 0, out var specialAvatarExcel) &&
+                                 specialAvatarExcel.AvatarID is 8002 or 8004 or 8006))
                     list.Remove(avatar);
             else
                 foreach (var avatar in tempList.Where(avatar =>
-                             GameData.SpecialAvatarData.TryGetValue(avatar * 10 + 0, out var specialAvatarExcel) &&
-                             specialAvatarExcel.AvatarID is 8001 or 8003 or 8005))
+                                 GameData.SpecialAvatarData.TryGetValue(avatar * 10 + 0, out var specialAvatarExcel) &&
+                                 specialAvatarExcel.AvatarID is 8001 or 8003 or 8005))
                     list.Remove(avatar);
         }
 
-        if (list.Count > 0) // if list is not empty
+        // 2. 如果是试用/剧情固定阵容模式
+        if (list.Count > 0) 
         {
             List<AvatarLineupData> avatars = [];
             foreach (var avatar in list)
@@ -170,29 +174,34 @@ public class BattleInstance(PlayerInstance player, LineupInfo lineup, List<Stage
                 else
                 {
                     var avatarInfo = Player.AvatarManager!.GetFormalAvatar(avatar);
-                    if (avatarInfo != null) avatars.Add(new AvatarLineupData(avatarInfo, AvatarType.AvatarFormalType));
+                    if (avatarInfo != null) 
+                        avatars.Add(new AvatarLineupData(avatarInfo, AvatarType.AvatarFormalType));
                 }
             }
-
             return avatars;
         }
         else
         {
+            // 3. 【核心修复】常规副本/拟造花萼编队（处理助战关键点）
             List<AvatarLineupData> avatars = [];
-            foreach (var avatar in Lineup.BaseAvatars!) // if list is empty, use scene lineup
+            foreach (var avatar in Lineup.BaseAvatars!) 
             {
                 BaseAvatarInfo? avatarInstance = null;
                 var avatarType = AvatarType.AvatarFormalType;
 
+                // --- 助战逻辑开始 ---
                 if (avatar.AssistUid != 0)
                 {
-                    var player = DatabaseHelper.Instance!.GetInstance<AvatarData>(avatar.AssistUid);
-                    if (player != null)
+                    // 修正：使用 GetInstanceOrCreateNew 确保离线大佬的数据也能被跨库读取
+                    var assistData = DatabaseHelper.Instance!.GetInstanceOrCreateNew<AvatarData>((int)avatar.AssistUid);
+                    if (assistData != null)
                     {
-                        avatarInstance = player.FormalAvatars.Find(item => item.BaseAvatarId == avatar.BaseAvatarId);
+                        // 在对方的正式角色库里寻找该 ID
+                        avatarInstance = assistData.FormalAvatars.Find(item => item.BaseAvatarId == avatar.BaseAvatarId);
                         avatarType = AvatarType.AvatarAssistType;
                     }
                 }
+                // --- 试用逻辑 ---
                 else if (avatar.SpecialAvatarId != 0)
                 {
                     var specialAvatar = Player.AvatarManager!.GetTrialAvatar(avatar.SpecialAvatarId);
@@ -203,6 +212,7 @@ public class BattleInstance(PlayerInstance player, LineupInfo lineup, List<Stage
                         avatarType = AvatarType.AvatarTrialType;
                     }
                 }
+                // --- 自身角色逻辑 ---
                 else
                 {
                     avatarInstance = Player.AvatarManager!.GetFormalAvatar(avatar.BaseAvatarId);
