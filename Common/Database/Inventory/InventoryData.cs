@@ -328,7 +328,7 @@ public class ItemSubAffix
     {
         Id = excel.AffixID;
         Count = count;
-        Step = Extensions.RandomInt(0, excel.StepNum * count + 1);
+        Step = Extensions.RandomInt(0, (excel.StepNum - 1) * count + 1);
     }
 
     public int Id { get; set; }
@@ -338,7 +338,7 @@ public class ItemSubAffix
     public void IncreaseStep(int stepNum)
     {
         Count++;
-        Step += Extensions.RandomInt(0, stepNum + 1);
+        Step += Extensions.RandomInt(0, stepNum);
     }
 
     public RelicAffix ToProto()
