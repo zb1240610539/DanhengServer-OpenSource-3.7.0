@@ -369,7 +369,8 @@ public class FormalAvatarInfo : BaseAvatarInfo
             {
                 AffixId = (uint)subAffixConf.AffixID,
                 Cnt = relic.AffixCount,
-                Step = (uint)(relic.AffixCount * subAffixConf.StepNum)
+                // 关键修正：确保索引在合法范围内
+    			Step = (uint)(relic.AffixCount * (subAffixConf.StepNum - 1))
             });
         }
 
