@@ -584,8 +584,10 @@ public class FormalAvatarInfo : BaseAvatarInfo
             var relic = inventory.RelicItems.Find(x => x.UniqueId == item.Value);
             // 确保这里的 if 有一对完整的括号
             if (relic != null)
-            {
-                proto.RelicList.Add(relic.ToDisplayRelicProto());
+            {   // 强制确保部位 ID (1-6) 正确，让 UI 能找到数据
+            	var relicDisplay = relic.ToDisplayRelicProto();
+        		relicDisplay.Type = (uint)item.Key;
+                proto.RelicList.Add(relicDisplay);
             }
         } // foreach 结束
 
