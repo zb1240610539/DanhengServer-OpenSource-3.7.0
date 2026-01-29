@@ -588,7 +588,7 @@ public class FormalAvatarInfo : BaseAvatarInfo
         
         		// 【核心修正】这里必须用 Slot！
         		// 这里的 item.Key 是部位 ID (1, 2, 3, 4, 5, 6)
-        		relicDisplay.Slot = (uint)item.Key;
+        		relicDisplay.Type = (uint)item.Key; // item.Key 是 1-6
                 proto.RelicList.Add(relicDisplay);
             }
         } // foreach 结束
