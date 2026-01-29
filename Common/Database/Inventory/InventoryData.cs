@@ -282,6 +282,7 @@ public class ItemData
         {
             Tid = (uint)ItemId,
             Level = (uint)Level,
+            Exp = (uint)Exp,
             Type = (uint)GameData.RelicConfigData[ItemId].Type,
             MainAffixId = (uint)MainAffix
         };
